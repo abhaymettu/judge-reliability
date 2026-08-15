@@ -285,6 +285,16 @@ loads the released GPT-4 judgments into the cache, runs the tests, and rewrites
 every number above. `make analysis` on its own does everything from the committed
 cache with no network at all.
 
+**No number in this README is typed by hand.** Every one of them is written by
+`07_report.py` out of `output/metrics.json`, so a result cannot drift from the
+data by being edited in one place and not the other. `LIMITATIONS.md` and
+`DECISIONS.md` are prose and do quote figures, so the same script cross checks
+every number those two assert against `metrics.json` and fails the build naming
+the sentence if one stops matching. It exists because a hand audit of this repo
+found three stale numbers in those two files, left behind by a bug fix that
+changed the sample sizes underneath them. The audit caught those; the check is
+there so the next ones cannot survive a build.
+
 To run a judge of your own, see [USAGE.md](USAGE.md). The harness needs one class
 with one method.
 
