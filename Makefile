@@ -1,6 +1,6 @@
 PY ?= python
 
-.PHONY: all analysis data judge test figures report clean clean-outputs help
+.PHONY: all analysis data judge test figures report clean clean-all clean-outputs help
 
 ## all: everything, from an empty checkout to the finished README
 all: data analysis
@@ -44,10 +44,14 @@ report:
 clean-outputs:
 	rm -rf output
 
-## clean: also delete the downloads and the derived table. Keeps data/judgments,
-## which is the paid for part and is committed.
+## clean: also delete the downloads. Keeps data/items.parquet and data/judgments,
+## which are committed and are what make `make analysis` work offline.
 clean: clean-outputs
-	rm -rf data/raw data/items.parquet
+	rm -rf data/raw
+
+## clean-all: delete the derived table too. `make all` rebuilds it, with network.
+clean-all: clean
+	rm -f data/items.parquet
 
 help:
 	@grep -E '^## ' Makefile | sed 's/## /  /'
