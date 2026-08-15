@@ -76,10 +76,11 @@ honest treatment: nobody knows the answer.
 ## The local judge runs on a seeded subsample, and only complete comparisons count
 
 A 3B judge under three templates, both orders, three samples and a padding
-condition is 12 calls per comparison. 300 comparisons, stratified by category and
-turn, is what fits in a few hours on a laptop. The measurement code drops any
-comparison the judge has not finished every condition on, so a partial run cannot
-bias the template comparison toward whichever template happened to run first.
+condition is 12 calls per comparison. A subsample stratified by category and
+turn drew 303 of them, which is what fits in a few hours on a laptop. The
+measurement code drops any comparison the judge has not finished every condition
+on, so a partial run cannot bias the template comparison toward whichever
+template happened to run first.
 
 ## The majority vote mitigation mixes one greedy sample with two sampled ones
 
@@ -97,11 +98,14 @@ estimated at 4 characters per token and every cached record carries
 per million tokens. The local judge is free at the point of use, so it is
 reported by wall clock instead.
 
-## The 800 duplicated GPT-4 rows are kept as a rerun measurement
+## The duplicated GPT-4 rows are kept as a rerun measurement
 
 The released pair file judges 800 comparisons twice, weeks apart, under an
-identical prompt. Sample 0 is the older run and is the one used everywhere else.
-The pair is used once, to measure how often GPT-4 disagrees with itself. That
+identical prompt. 678 of those are comparisons the humans also labelled, which
+is what the rerun measurement is computed on: 678 comparisons in two orders,
+1356 repeated judgments. Sample 0 is the older run and is the one used
+everywhere else, and the pair is used once, to measure how often GPT-4
+disagrees with itself. That
 number turned out to be the most useful denominator in the repo: it is what the
 position bias flip rate has to be compared against.
 

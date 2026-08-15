@@ -30,14 +30,16 @@ that is genuine ambiguity and some is annotation error, and this data cannot tel
 them apart. 853 of 1814 comparisons have a single annotator, so their majority
 label is one person's opinion. Those comparisons still count toward judge
 agreement, which adds noise in a direction that penalises every judge equally.
-The ceiling is computed only on comparisons with two or more annotators, and the
-leave one out ceiling only on those with three or more, which is 752 annotator
-comparisons rather than 1814.
+The ceiling is computed only on comparisons with two or more annotators, 961 of
+them. The leave one out ceiling is narrower still: it needs three or more votes,
+so it rests on 249 comparisons, which between them supply 752 annotator against
+majority scorings. That is the ceiling the headline is measured against, and it
+is the thinnest number in the repo.
 
 ## Self preference is measured on one judge and one family
 
-The gap for GPT-4 judging GPT-4 responses is measured on 563 comparisons, and
-the control on claude-v1 responses on 586. That is enough to see the effect but
+The gap for GPT-4 judging GPT-4 responses is measured on 578 comparisons, and
+the control on claude-v1 responses on 594. That is enough to see the effect but
 not enough to characterise it, and it comes from one judge model, one response
 set and one point in time. It also cannot separate self preference from a real
 quality advantage that the human annotators underweighted, or from stylistic
@@ -56,7 +58,7 @@ judge you are actually shipping.
 
 ## The local judge is measured on a subsample
 
-300 comparisons, seeded and stratified by category and turn, out of 1814. Its
+303 comparisons, seeded and stratified by category and turn, out of 1814. Its
 intervals are correspondingly wide and its per model win rates rest on roughly a
 hundred comparisons each. The GPT-4 numbers on the same subsample are reported
 next to it, so the comparison between the two judges is like for like even though

@@ -5,8 +5,7 @@ pair of answers agrees with the human majority 85.5 percent of the time,
 against a human ceiling of 88.2 percent and a length only baseline that
 reaches 70.6 percent. Reversing the order the two answers are shown in
 flips the verdict on 16.1 percent of comparisons, and swap averaging
-recovers 2.9 points of agreement, which is most of the gap
-to the ceiling.**
+recovers 2.9 points of agreement, which closes the gap to that ceiling.**
 
 The judge is good. It is also not better than a careful human, it is only
 14.9 points better than a rule that reads none
@@ -188,8 +187,9 @@ surprise: the rubric is the prompt that tells the judge in as many words not to
 reward length or position, and it is the worst of the three. Scaffolding that
 sounds like it should help is exactly the kind of thing that has to be measured.
 
-For scale, on these same 303 comparisons GPT-4 scores
-82.9 and the length rule scores 68.3.
+For scale, on this same pool of 303 comparisons GPT-4
+scores 82.9 (n=216 after ties are excluded) and the
+length rule scores 68.3 (n=224).
 Every prompt variant of the 3B judge sits at or below the length rule. What the
 local judge contributes is not accuracy, it is that it is cheap enough to run
 under every prompt variant, which is the experiment a team needs before trusting
@@ -216,6 +216,11 @@ much as with debiasing, which is fine as long as you know that is the trade.
 ## 7. Cost against reliability
 
 ![cost against reliability](output/figures/fig6_cost_reliability.png)
+
+Every point in that figure is measured on one pool of comparisons, the subsample
+the local judge ran on, so the accuracies there are not the full set accuracies
+in the table above. Mixing the two pools on one axis would compare different
+samples as though they were the same one.
 
 | judge | mean input tokens | mean output tokens | USD per 1000 judgments | median latency |
 | --- | --- | --- | --- | --- |

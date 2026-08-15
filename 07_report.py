@@ -64,6 +64,16 @@ def build(m):
     verb_human = m["verbosity"]["human majority"]
     verb_gpt4 = m["verbosity"]["gpt-4 pairwise, one order"]
 
+    # The one comparative claim in the headline, derived rather than asserted, so
+    # it cannot survive the numbers moving underneath it.
+    ceiling_gap = ceiling["accuracy"] - gpt4["accuracy"]
+    recovered = swap_mitigation["delta"]
+    gap_phrase = (
+        "which closes the gap to that ceiling"
+        if recovered >= ceiling_gap
+        else f"which closes {recovered / ceiling_gap:.0%} of the {num(ceiling_gap)} point gap to that ceiling"
+    )
+
     local_rows = [r for r in no_ties if r["label"].startswith("local 3B")]
     has_local = bool(local_rows)
     local_note = (
@@ -82,8 +92,7 @@ pair of answers agrees with the human majority {pct(gpt4['accuracy'])} of the ti
 against a human ceiling of {pct(ceiling['accuracy'])} and a length only baseline that
 reaches {pct(length['accuracy'])}. Reversing the order the two answers are shown in
 flips the verdict on {pct(position['flip_rate'])} of comparisons, and swap averaging
-recovers {num(swap_mitigation['delta'])} points of agreement, which is most of the gap
-to the ceiling.**
+recovers {num(swap_mitigation['delta'])} points of agreement, {gap_phrase}.**
 
 The judge is good. It is also not better than a careful human, it is only
 {num(gpt4['accuracy'] - length['accuracy'])} points better than a rule that reads none
@@ -273,8 +282,9 @@ surprise: the rubric is the prompt that tells the judge in as many words not to
 reward length or position, and it is the worst of the three. Scaffolding that
 sounds like it should help is exactly the kind of thing that has to be measured.
 
-For scale, on these same {data['local_judge_subsample']} comparisons GPT-4 scores
-{num(local_gpt4['accuracy'])} and the length rule scores {num(local_length['accuracy'])}.
+For scale, on this same pool of {data['local_judge_subsample']} comparisons GPT-4
+scores {num(local_gpt4['accuracy'])} (n={local_gpt4['n']} after ties are excluded) and the
+length rule scores {num(local_length['accuracy'])} (n={local_length['n']}).
 Every prompt variant of the 3B judge sits at or below the length rule. What the
 local judge contributes is not accuracy, it is that it is cheap enough to run
 under every prompt variant, which is the experiment a team needs before trusting
@@ -322,6 +332,11 @@ much as with debiasing, which is fine as long as you know that is the trade.
 ## 7. Cost against reliability
 
 ![cost against reliability](output/figures/fig6_cost_reliability.png)
+
+Every point in that figure is measured on one pool of comparisons, the subsample
+the local judge ran on, so the accuracies there are not the full set accuracies
+in the table above. Mixing the two pools on one axis would compare different
+samples as though they were the same one.
 
 | judge | mean input tokens | mean output tokens | USD per 1000 judgments | median latency |
 | --- | --- | --- | --- | --- |
@@ -434,9 +449,47 @@ carries its value as text.
     return "".join(parts)
 
 
+def check_static_docs(m):
+    """Every number a hand written document asserts, checked against metrics.json.
+
+    README.md is generated so it cannot drift. LIMITATIONS.md and DECISIONS.md
+    are written by hand, and a hand written number that quietly stops matching
+    the data is the most common way an honest repo starts lying. Anything
+    asserted there is registered here and the build fails if it moves.
+    """
+    data = m["dataset"]
+    nt = {r["label"]: r for r in m["agreement"]["no_ties"]}
+    ceiling = nt["human ceiling, one annotator vs the majority of the others"]
+    self_pref = m["self_preference"]["gpt-4 judging gpt-4 responses"]
+    control = m["self_preference"]["gpt-4 judging claude-v1 responses (control)"]
+
+    claims = [
+        ("DECISIONS.md", f"{data['human_votes']} individual votes", "human votes"),
+        ("DECISIONS.md", f"over {data['comparisons']} distinct comparisons", "comparisons"),
+        ("DECISIONS.md", f"{m['rerun_stability']['n_judgments'] // 2} of those are comparisons", "reruns"),
+        ("DECISIONS.md", f"{m['rerun_stability']['n_judgments']} repeated judgments", "repeated judgments"),
+        ("DECISIONS.md", f"turn drew {data['local_judge_subsample']} of them", "local subsample"),
+        ("LIMITATIONS.md", f"measured on {self_pref['n']} comparisons", "self preference n"),
+        ("LIMITATIONS.md", f"claude-v1 responses on {control['n']}", "self preference control n"),
+        ("LIMITATIONS.md", f"rests on {ceiling['n_comparisons']} comparisons", "leave one out comparisons"),
+        ("LIMITATIONS.md", f"supply {ceiling['n']} annotator against", "leave one out scorings"),
+        ("LIMITATIONS.md", f"two or more annotators, {data['comparisons_with_2plus_annotators']} of", "2+ annotators"),
+        ("LIMITATIONS.md", f"{data['local_judge_subsample']} comparisons, seeded", "local subsample"),
+    ]
+    stale = []
+    for filename, phrase, what in claims:
+        with open(os.path.join(HERE, filename), encoding="utf-8") as fh:
+            body = " ".join(fh.read().split())
+        if " ".join(phrase.split()) not in body:
+            stale.append(f"{filename}: {what} no longer matches the data, expected the phrase {phrase!r}")
+    if stale:
+        raise SystemExit("stale hand written claims:\n  " + "\n  ".join(stale))
+
+
 def main():
     with open(os.path.join(HERE, "output", "metrics.json"), encoding="utf-8") as fh:
         metrics = json.load(fh)
+    check_static_docs(metrics)
     text = build(metrics)
     if "—" in text or "–" in text:
         raise SystemExit("house rule: no dashes of that kind in the README")

@@ -212,7 +212,18 @@ def fig_mitigations(m):
 
 
 def fig_cost(m):
-    acc = {r["label"]: r for r in m["agreement"]["no_ties"] if r["n"] > 0}
+    """Reliability against price, with every point on ONE comparison pool.
+
+    The local judge only ran on a subsample. Plotting its accuracy on the same
+    axis as GPT-4's full set accuracy would compare two different samples as if
+    they were one, so when the local judge is present the whole figure switches
+    to the subsample both were measured on, and the title says so.
+    """
+    on_subsample = any(
+        r["label"].startswith("local 3B") for r in m["agreement"]["no_ties"] if r["n"] > 0
+    )
+    source = m["agreement_on_local_subsample"] if on_subsample else m["agreement"]["no_ties"]
+    acc = {r["label"]: r for r in source if r["n"] > 0}
     cost_by_judge = {c["judge_id"]: c for c in m["cost"]}
     points = []
     mapping = {
@@ -232,25 +243,49 @@ def fig_cost(m):
     if not points:
         return
 
-    fig, ax = plt.subplots(figsize=(8.2, 4.6))
-    for usd, a, label in points:
+    local_speed = cost_by_judge.get("qwen2.5-3b-4bit-local", {}).get("median_latency_s")
+
+    fig, ax = plt.subplots(figsize=(8.6, 4.8))
+    # Nudge labels apart when two points nearly coincide, which they do at zero.
+    placed = []
+    for usd, a, label in sorted(points, key=lambda p: (p[0], -p[1])):
         colour = BASELINE if "baseline" in label else JUDGE
         ax.scatter([usd], [a], s=90, color=colour, zorder=4, edgecolor="white", linewidth=1.2)
-        ax.annotate(f"{label}\n${usd:.0f} per 1000, {a:.1%}", (usd, a), textcoords="offset points",
-                    xytext=(10, 7), fontsize=8, color=MUTED)
-    ceiling = next((r for r in m["agreement"]["no_ties"] if r["label"].startswith("human ceiling, one")), None)
+        price = f"${usd:.0f} per 1000"
+        if usd == 0 and label.startswith("local") and local_speed:
+            price = f"no API cost, {local_speed:.1f} s per judgment on a laptop"
+        offset = 9
+        while any(abs(usd - u) < 45 and abs((a + offset / 400) - p) < 0.030 for u, p in placed):
+            offset -= 15
+        placed.append((usd, a + offset / 400))
+        # A leader line, so a nudged label can never be read as belonging to the
+        # neighbouring point. Wrong attribution is the expensive kind of mistake.
+        ax.annotate(f"{label}\n{price}, {a:.1%}", (usd, a), textcoords="offset points",
+                    xytext=(12, offset), fontsize=8, color=MUTED,
+                    arrowprops=dict(arrowstyle="-", color=GRID, linewidth=0.9,
+                                    shrinkA=0, shrinkB=6))
+    # Whichever human ceiling was computed on this pool. On the subsample only
+    # the annotator against annotator one has enough votes to exist.
+    ceiling = next((r for r in source if r["label"].startswith("human ceiling")), None) or next(
+        (r for r in source if r["label"].startswith("human")), None
+    )
     if ceiling:
         ax.axhline(ceiling["accuracy"], color=HUMAN, linewidth=1.6, linestyle="--")
-        ax.text(0.995, ceiling["accuracy"] + 0.005, "human ceiling  ", color=HUMAN, fontsize=8,
+        ax.text(0.995, ceiling["accuracy"] + 0.005, ceiling["label"] + "  ", color=HUMAN, fontsize=8,
                 ha="right", transform=ax.get_yaxis_transform(which="grid"))
     ax.set_xlabel("USD per 1000 comparisons (estimated from cached token counts)")
     as_percent(ax.yaxis)
     ax.set_ylabel("agreement with the human majority")
-    ax.set_xlim(-8, max(p[0] for p in points) * 1.55 + 8)
-    ax.set_ylim(min(p[1] for p in points) - 0.06, max(max(p[1] for p in points), ceiling["accuracy"] if ceiling else 0) + 0.05)
+    ax.set_xlim(-14, max(p[0] for p in points) * 1.75 + 8)
+    ax.set_ylim(min(p[1] for p in points) - 0.09, max(max(p[1] for p in points), ceiling["accuracy"] if ceiling else 0) + 0.05)
     ax.grid(True, color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
-    ax.set_title("Reliability against price", loc="left", fontsize=11, color=INK, pad=12)
+    pool = (
+        f"all judges on the {m['dataset']['local_judge_subsample']} comparison subsample"
+        if on_subsample
+        else f"all {m['dataset']['comparisons']} comparisons"
+    )
+    ax.set_title(f"Reliability against price, {pool}", loc="left", fontsize=11, color=INK, pad=12)
     finish(fig, os.path.join(OUT, "fig6_cost_reliability.png"))
 
 
