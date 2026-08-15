@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 597, "item_id": "q118-t1-claude-v1-gpt-4", "judge_id": "qwen2.5-3b-4bit-local", "key": "4f8d3b967dfdc692efc6ee310d10e74aef8dc0279f14e771b7f965663e252c5f", "latency_s": 1.7238602919969708, "order": "ba", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[A]]", "verdict": "first"}

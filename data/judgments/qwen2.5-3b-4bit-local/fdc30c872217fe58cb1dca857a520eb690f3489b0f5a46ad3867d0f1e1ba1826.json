@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 1188, "item_id": "q126-t1-claude-v1-gpt-3.5-turbo", "judge_id": "qwen2.5-3b-4bit-local", "key": "fdc30c872217fe58cb1dca857a520eb690f3489b0f5a46ad3867d0f1e1ba1826", "latency_s": 1.8901343329926021, "order": "ab", "out_tokens": 3, "sample": 2, "template": "rubric", "text": "[[B]]", "verdict": "second"}

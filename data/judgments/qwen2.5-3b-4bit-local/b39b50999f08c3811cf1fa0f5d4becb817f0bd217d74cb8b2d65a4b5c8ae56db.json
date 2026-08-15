@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 330, "item_id": "q118-t1-gpt-3.5-turbo-llama-13b", "judge_id": "qwen2.5-3b-4bit-local", "key": "b39b50999f08c3811cf1fa0f5d4becb817f0bd217d74cb8b2d65a4b5c8ae56db", "latency_s": 1.2199492079671472, "order": "ab", "out_tokens": 3, "sample": 0, "template": "bare", "text": "[[B]]", "verdict": "second"}

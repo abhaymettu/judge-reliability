@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 1258, "item_id": "q129-t2-gpt-4-llama-13b", "judge_id": "qwen2.5-3b-4bit-local", "key": "a486d91b45e82526f17a5852fe7857b8d48dc3ce07de2469a56d1f4fb7a33913", "latency_s": 2.772908291022759, "order": "ab", "out_tokens": 3, "sample": 2, "template": "rubric", "text": "[[A]]", "verdict": "first"}

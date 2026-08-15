@@ -1,0 +1,1 @@
+{"condition": "padded", "in_tokens": 2153, "item_id": "q123-t2-claude-v1-gpt-4", "judge_id": "qwen2.5-3b-4bit-local", "key": "e79200f96b88ec9a9dc7da024d54eb4e9b94f16804f830dcf2b8be3b5b34c334", "latency_s": 4.301812542020343, "order": "ba", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[A]]", "verdict": "first"}

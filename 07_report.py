@@ -32,13 +32,6 @@ def find(rows, label):
     raise KeyError(f"{label} is not in metrics.json, so it cannot go in the README")
 
 
-def maybe(rows, label):
-    try:
-        return find(rows, label)
-    except KeyError:
-        return None
-
-
 def agreement_table(rows):
     out = [
         "| configuration | agreement | 95 percent CI | comparisons scored |",
@@ -57,7 +50,6 @@ def build(m):
     with_ties = m["agreement"]["with_ties"]
 
     gpt4 = find(no_ties, "gpt-4 pairwise, one order")
-    gpt4_swap = find(no_ties, "gpt-4 pairwise, swap averaged")
     gpt4_single = find(no_ties, "gpt-4 single answer grading")
     ceiling = find(no_ties, "human ceiling, one annotator vs the majority of the others")
     raw_ceiling = find(no_ties, "human to human ceiling")
@@ -74,6 +66,12 @@ def build(m):
 
     local_rows = [r for r in no_ties if r["label"].startswith("local 3B")]
     has_local = bool(local_rows)
+    local_note = (
+        f", plus a local\n  Qwen2.5 3B judge run here on a laptop over a seeded subsample of "
+        f"{data['local_judge_subsample']} of them"
+        if has_local
+        else ""
+    )
 
     parts = []
     parts.append(
@@ -118,8 +116,8 @@ key, no model call, no network beyond the initial public data download.
   {data['comparisons_with_2plus_annotators']} comparisons have two or more annotators,
   which is what makes a ceiling possible.
 - **Judges**: GPT-4 (0613) pairwise in both presentation orders and GPT-4 single answer
-  grading, both from the judgments LMSYS released with MT-Bench, plus a local
-  Qwen2.5 3B run here on a laptop, plus two non LLM baselines.
+  grading, both from the judgments LMSYS released with MT-Bench{local_note}, plus two
+  non LLM baselines: always prefer the longer answer, and a coin flip.
 
 ## 1. Agreement, and the ceiling that gives it meaning
 
@@ -328,6 +326,25 @@ magnitude. Swap averaging doubles it.
 """
     )
 
+    extra_finding = ""
+    if has_local:
+        best_local = max(local_rows, key=lambda r: r["accuracy"])
+        local_length = find(m["agreement_on_local_subsample"], "length baseline")
+        local_flips = {
+            k: v for k, v in m["position_bias"].items() if k.startswith("local 3B") and "flip_rate" in v
+        }
+        worst_flip = max(local_flips.items(), key=lambda kv: kv[1]["flip_rate"])
+        extra_finding = f"""6. **The small local judge does not beat the length baseline.** Its best prompt
+   reaches {pct(best_local['accuracy'])} on the subsample where the length rule reaches
+   {pct(local_length['accuracy'])}. On this evidence a 3B judge on these comparisons is
+   measuring verbosity and noise, and should not be shipped as an evaluator.
+7. **Chain of thought made the local judge less stable, not more.** Under
+   {worst_flip[0].replace('local 3B, ', '')} the verdict reverses on
+   {pct(worst_flip[1]['flip_rate'])} of comparisons when the order is reversed, worse
+   than the same model given a bare instruction. Reasoning traces are not free
+   reliability.
+"""
+
     parts.append(
         f"""
 ## The unflattering findings, in one place
@@ -354,7 +371,7 @@ magnitude. Swap averaging doubles it.
    single answer grading reaches {pct(gpt4_single['accuracy'])}, the highest number in
    the repo, on {gpt4_single['n']} comparisons rather than {gpt4['n']}. Read coverage
    next to accuracy or that number is a mirage.
-
+{extra_finding}
 ## Reproduce
 
 ```bash

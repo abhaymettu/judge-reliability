@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 732, "item_id": "q119-t2-alpaca-13b-gpt-4", "judge_id": "qwen2.5-3b-4bit-local", "key": "e6351963aab34aa14b8af7ef322743ff8b320072b8b3ca8bb0bcaebef74296f9", "latency_s": 2.2561102499603294, "order": "ba", "out_tokens": 3, "sample": 0, "template": "bare", "text": "[[A]]", "verdict": "first"}

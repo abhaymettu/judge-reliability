@@ -1,0 +1,1 @@
+{"condition": "padded", "in_tokens": 1234, "item_id": "q113-t2-gpt-4-llama-13b", "judge_id": "qwen2.5-3b-4bit-local", "key": "e674b38568efa4a1a96fccd86bdd23092a25ea78dccbba04ee0fd2fbe5d5ee14", "latency_s": 2.481218250002712, "order": "ba", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[B]]", "verdict": "second"}

@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 1459, "item_id": "q111-t2-gpt-4-vicuna-13b-v1.2", "judge_id": "qwen2.5-3b-4bit-local", "key": "2a709aca57e2b6c06d0894a92ec938bfb3fd1d586f06a3249f56c21364381e5e", "latency_s": 2.8938372090342455, "order": "ba", "out_tokens": 3, "sample": 2, "template": "rubric", "text": "[[B]]", "verdict": "second"}

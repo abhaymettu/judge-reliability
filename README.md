@@ -40,7 +40,8 @@ key, no model call, no network beyond the initial public data download.
   which is what makes a ceiling possible.
 - **Judges**: GPT-4 (0613) pairwise in both presentation orders and GPT-4 single answer
   grading, both from the judgments LMSYS released with MT-Bench, plus a local
-  Qwen2.5 3B run here on a laptop, plus two non LLM baselines.
+  Qwen2.5 3B judge run here on a laptop over a seeded subsample of 118 of them, plus two
+  non LLM baselines: always prefer the longer answer, and a coin flip.
 
 ## 1. Agreement, and the ceiling that gives it meaning
 
@@ -57,6 +58,10 @@ a judge that abstains more is scored on fewer and easier comparisons.
 | gpt-4 pairwise, one order | 85.4 | 83.4 to 87.4 | 1184 |
 | human to human ceiling | 82.7 | 80.0 to 85.5 | 1550 |
 | length baseline | 70.6 | 68.0 to 73.1 | 1254 |
+| local 3B, bare prompt, one order | 63.9 | 52.7 to 74.6 | 72 |
+| local 3B, rubric prompt, swap averaged | 61.7 | 47.2 to 75.5 | 47 |
+| local 3B, rubric prompt, one order | 61.6 | 50.0 to 72.5 | 73 |
+| local 3B, cot prompt, one order | 58.5 | 44.9 to 72.0 | 53 |
 | random baseline | 51.9 | 49.1 to 54.6 | 1262 |
 
 Two ceilings, because the obvious one is unfair to humans. Annotator against
@@ -86,7 +91,11 @@ Same table, ties kept and counted as a third label:
 | human ceiling, one annotator vs the majority of the others | 64.9 | 60.8 to 68.9 | 1380 |
 | gpt-4 pairwise, one order | 64.8 | 62.5 to 67.1 | 1786 |
 | length baseline | 49.9 | 47.6 to 52.3 | 1814 |
+| local 3B, bare prompt, one order | 39.8 | 31.4 to 48.3 | 118 |
+| local 3B, rubric prompt, one order | 38.1 | 29.7 to 46.6 | 118 |
 | random baseline | 36.1 | 33.9 to 38.3 | 1814 |
+| local 3B, rubric prompt, swap averaged | 35.6 | 27.1 to 44.1 | 118 |
+| local 3B, cot prompt, one order | 33.7 | 24.5 to 43.3 | 98 |
 
 ## 2. Position bias, next to the judge's own noise
 
@@ -128,6 +137,12 @@ already agrees with humans 70.6 percent of the time, against a coin flip's
 51.9 percent. Roughly 83 percent of what a
 frontier judge achieves is achievable by counting characters.
 
+The controlled version holds quality fixed: pad the shorter answer with content
+free filler until it is half again as long as the longer one, and see whether the
+verdict moves. On 99 comparisons where the local judge preferred the other
+answer before padding, it moved to the padded answer
+**4.0 percent** of the time (1.0 to 8.1).
+
 ## 4. Self preference
 
 GPT-4 judging comparisons that include a GPT-4 response, against how the same
@@ -147,9 +162,31 @@ kinship: GPT-4 may simply favour answers that look like its own.
 
 ## 5. Prompt sensitivity
 
-Not measured in this run: the local judge cache is empty. Run
-`make judge` and then `make analysis`, or see USAGE.md to point the harness at a
-model of your own.
+The judge prompt is a free parameter that teams pick by taste. Here are three,
+identical except for scaffolding, run by the same local Qwen2.5 3B model over the
+same 118 comparisons: a bare instruction, a rubric with an
+explicit warning about length and order, and a chain of thought prompt.
+
+![model win rates by judge prompt](output/figures/fig4_prompt_sensitivity.png)
+
+| judge prompt | agreement | 95 percent CI | comparisons scored |
+| --- | --- | --- | --- |
+| bare prompt, one order | 63.9 | 52.7 to 74.6 | 72 |
+| rubric prompt, swap averaged | 61.7 | 47.2 to 75.5 | 47 |
+| rubric prompt, one order | 61.6 | 50.0 to 72.5 | 73 |
+| cot prompt, one order | 58.5 | 44.9 to 72.0 | 53 |
+
+Changing nothing but the judge prompt moves agreement by
+5.4 points, from 58.5 to
+63.9. Kendall tau between each prompt's model ranking and the human
+ranking: bare prompt 0.60, cot prompt 0.47, rubric prompt 0.60, rubric prompt 0.47. The model at the top of the leaderboard under each prompt:
+bare prompt, one order picks gpt-4, cot prompt, one order picks claude-v1, rubric prompt, one order picks gpt-4, rubric prompt, swap averaged picks vicuna-13b-v1.2.
+
+On the same 118 comparisons GPT-4 scores
+82.8, so the gap between a frontier judge and a laptop judge is
+real and large. What the local judge adds is the sensitivity measurement: it is
+cheap enough to run under every prompt variant, which is the experiment a team
+actually needs before trusting a leaderboard.
 
 ## 6. Mitigations, measured rather than assumed
 
@@ -158,6 +195,10 @@ model of your own.
 | mitigation | before | after | change | 95 percent CI | comparisons scored before and after |
 | --- | --- | --- | --- | --- | --- |
 | gpt-4: swap averaging | 85.4 | 88.3 | +2.9 | 1.9 to 4.0 | 66 percent to 60 percent |
+| local 3B: rubric prompt instead of bare | 63.9 | 61.6 | -2.2 | -11.6 to 7.0 | 61 percent to 62 percent |
+| local 3B: chain of thought prompt instead of bare | 63.9 | 58.5 | -5.4 | -21.8 to 10.9 | 61 percent to 45 percent |
+| local 3B: swap averaging | 61.6 | 61.7 | +0.1 | -8.6 to 8.7 | 62 percent to 40 percent |
+| local 3B: majority vote over 3 samples | 61.1 | 61.1 | +0.0 | 0.0 to 0.0 | 62 percent to 62 percent |
 
 Swap averaging is the one that works, and it is not free: it doubles the number
 of model calls and it converts every order disagreement into a tie, so coverage
@@ -173,6 +214,7 @@ much as with debiasing, which is fine as long as you know that is the trade.
 | --- | --- | --- | --- | --- |
 | gpt-4-0613-pair | 988 | 148 | 38.50 (estimated) | not recorded |
 | gpt-4-0613-single | 1258 | 351 | 58.82 (estimated) | not recorded |
+| qwen2.5-3b-4bit-local | 799 | 47 | 0.00 | 1.70 s |
 
 Token counts for the released GPT-4 judgments are estimated from character
 counts and priced at gpt-4-0613 list prices, so treat that column as an order of
@@ -202,6 +244,15 @@ magnitude. Swap averaging doubles it.
    single answer grading reaches 91.4 percent, the highest number in
    the repo, on 747 comparisons rather than 1184. Read coverage
    next to accuracy or that number is a mirage.
+6. **The small local judge does not beat the length baseline.** Its best prompt
+   reaches 63.9 percent on the subsample where the length rule reaches
+   67.1 percent. On this evidence a 3B judge on these comparisons is
+   measuring verbosity and noise, and should not be shipped as an evaluator.
+7. **Chain of thought made the local judge less stable, not more.** Under
+   cot prompt the verdict reverses on
+   52.5 percent of comparisons when the order is reversed, worse
+   than the same model given a bare instruction. Reasoning traces are not free
+   reliability.
 
 ## Reproduce
 

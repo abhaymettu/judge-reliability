@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 884, "item_id": "q121-t1-gpt-3.5-turbo-gpt-4", "judge_id": "qwen2.5-3b-4bit-local", "key": "557de1d1f6bf22d5f77e083939c77cef1477acb8324bfb2e9bdfbb8eb179fa13", "latency_s": 2.4233672919799574, "order": "ab", "out_tokens": 3, "sample": 1, "template": "rubric", "text": "[[A]]", "verdict": "first"}

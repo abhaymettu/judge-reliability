@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 1402, "item_id": "q121-t2-claude-v1-vicuna-13b-v1.2", "judge_id": "qwen2.5-3b-4bit-local", "key": "2a0b14809281f8f40233658b92eb287203248ac02649b5e2e4bb19f527f940ef", "latency_s": 2.440118375001475, "order": "ab", "out_tokens": 3, "sample": 1, "template": "rubric", "text": "[[A]]", "verdict": "first"}

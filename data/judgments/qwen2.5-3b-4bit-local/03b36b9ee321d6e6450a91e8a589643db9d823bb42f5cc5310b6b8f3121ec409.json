@@ -1,0 +1,1 @@
+{"condition": "padded", "in_tokens": 727, "item_id": "q112-t2-alpaca-13b-claude-v1", "judge_id": "qwen2.5-3b-4bit-local", "key": "03b36b9ee321d6e6450a91e8a589643db9d823bb42f5cc5310b6b8f3121ec409", "latency_s": 1.7599807499791496, "order": "ab", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[B]]", "verdict": "second"}

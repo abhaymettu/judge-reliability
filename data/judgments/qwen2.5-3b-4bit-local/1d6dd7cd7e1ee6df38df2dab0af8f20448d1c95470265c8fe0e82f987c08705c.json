@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 626, "item_id": "q121-t1-alpaca-13b-claude-v1", "judge_id": "qwen2.5-3b-4bit-local", "key": "1d6dd7cd7e1ee6df38df2dab0af8f20448d1c95470265c8fe0e82f987c08705c", "latency_s": 0.8356464579701424, "order": "ba", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[A]]", "verdict": "first"}
