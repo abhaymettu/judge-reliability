@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 596, "item_id": "q101-t2-claude-v1-llama-13b", "judge_id": "qwen2.5-3b-4bit-local", "key": "dfbf3431a22ea3bb92a42768c08d3a45f1deade697255104f0012eb0f1bcb89e", "latency_s": 0.7285210830159485, "order": "ab", "out_tokens": 3, "sample": 2, "template": "rubric", "text": "[[A]]", "verdict": "first"}

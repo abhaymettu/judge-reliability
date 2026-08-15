@@ -1,0 +1,14 @@
+# Public downloads, ~110 MB, refetched by `python 00_download.py`.
+data/raw/
+# Derived from data/raw by 02_build_items.py.
+data/items.parquet
+# Progress log from a judge run.
+output/judge_run.log
+
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# data/judgments/ is deliberately committed. It is the paid for part, and it is
+# what lets `make analysis` reproduce every number with no API key.

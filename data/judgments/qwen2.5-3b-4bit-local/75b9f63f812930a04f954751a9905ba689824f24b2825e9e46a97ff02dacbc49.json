@@ -1,0 +1,1 @@
+{"condition": "padded", "in_tokens": 532, "item_id": "q102-t2-alpaca-13b-gpt-3.5-turbo", "judge_id": "qwen2.5-3b-4bit-local", "key": "75b9f63f812930a04f954751a9905ba689824f24b2825e9e46a97ff02dacbc49", "latency_s": 0.687011000001803, "order": "ab", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[B]]", "verdict": "second"}

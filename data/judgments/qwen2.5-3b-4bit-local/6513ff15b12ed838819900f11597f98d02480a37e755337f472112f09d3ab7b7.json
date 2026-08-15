@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 1143, "item_id": "q100-t2-gpt-3.5-turbo-vicuna-13b-v1.2", "judge_id": "qwen2.5-3b-4bit-local", "key": "6513ff15b12ed838819900f11597f98d02480a37e755337f472112f09d3ab7b7", "latency_s": 2.0529905420262367, "order": "ba", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[A]]", "verdict": "first"}

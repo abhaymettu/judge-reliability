@@ -1,0 +1,6 @@
+# Only needed to run judges yourself (step 04). Not needed to reproduce the
+# numbers in the README, which read from the committed cache in data/judgments/.
+-r requirements.txt
+mlx==0.32.0
+mlx-lm==0.31.3
+transformers==5.15.0

@@ -1,0 +1,1 @@
+{"condition": "padded", "in_tokens": 707, "item_id": "q106-t2-gpt-4-vicuna-13b-v1.2", "judge_id": "qwen2.5-3b-4bit-local", "key": "2a151b192ccc7158542943c3457897f4156d6f833ae512766e3bbc8e94368777", "latency_s": 0.9179161670035683, "order": "ba", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[A]]", "verdict": "first"}

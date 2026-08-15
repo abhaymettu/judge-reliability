@@ -1,0 +1,519 @@
+{
+  "dataset": {
+    "comparisons": 1814,
+    "human_votes": 3355,
+    "annotators": 65,
+    "questions": 80,
+    "models": [
+      "alpaca-13b",
+      "claude-v1",
+      "gpt-3.5-turbo",
+      "gpt-4",
+      "llama-13b",
+      "vicuna-13b-v1.2"
+    ],
+    "comparisons_with_2plus_annotators": 961,
+    "human_label_counts": {
+      "a": 671,
+      "b": 591,
+      "tie": 552
+    },
+    "local_judge_subsample": 0
+  },
+  "agreement": {
+    "no_ties": [
+      {
+        "label": "human to human ceiling",
+        "setup": "no_ties",
+        "accuracy": 0.8270967741935484,
+        "ci": [
+          0.8004970884219614,
+          0.8546716110806036
+        ],
+        "n": 1550,
+        "n_comparisons": 699
+      },
+      {
+        "label": "human ceiling, one annotator vs the majority of the others",
+        "setup": "no_ties",
+        "accuracy": 0.8816489361702128,
+        "ci": [
+          0.8496636947043551,
+          0.9107374319113888
+        ],
+        "n": 752,
+        "n_comparisons": 249
+      },
+      {
+        "label": "gpt-4 pairwise, one order",
+        "setup": "no_ties",
+        "accuracy": 0.8538851351351351,
+        "ci": [
+          0.833747822763147,
+          0.8739589051631558
+        ],
+        "n": 1184
+      },
+      {
+        "label": "gpt-4 pairwise, swap averaged",
+        "setup": "no_ties",
+        "accuracy": 0.883177570093458,
+        "ci": [
+          0.8633424146456722,
+          0.9021237303785781
+        ],
+        "n": 1070
+      },
+      {
+        "label": "gpt-4 single answer grading",
+        "setup": "no_ties",
+        "accuracy": 0.9143239625167336,
+        "ci": [
+          0.8936742934051144,
+          0.9338624338624338
+        ],
+        "n": 747
+      },
+      {
+        "label": "length baseline",
+        "setup": "no_ties",
+        "accuracy": 0.7057416267942583,
+        "ci": [
+          0.6801909307875895,
+          0.7309898299390875
+        ],
+        "n": 1254
+      },
+      {
+        "label": "random baseline",
+        "setup": "no_ties",
+        "accuracy": 0.5190174326465927,
+        "ci": [
+          0.49124063469704393,
+          0.5458135860979463
+        ],
+        "n": 1262
+      }
+    ],
+    "with_ties": [
+      {
+        "label": "human to human ceiling",
+        "setup": "with_ties",
+        "accuracy": 0.6554054054054054,
+        "ci": [
+          0.6270693307828011,
+          0.6847230682440346
+        ],
+        "n": 2368,
+        "n_comparisons": 961
+      },
+      {
+        "label": "human ceiling, one annotator vs the majority of the others",
+        "setup": "with_ties",
+        "accuracy": 0.6492753623188405,
+        "ci": [
+          0.6082015376023633,
+          0.6886864085041762
+        ],
+        "n": 1380,
+        "n_comparisons": 400
+      },
+      {
+        "label": "gpt-4 pairwise, one order",
+        "setup": "with_ties",
+        "accuracy": 0.6478163493840985,
+        "ci": [
+          0.6253504936660619,
+          0.6705750977107761
+        ],
+        "n": 1786
+      },
+      {
+        "label": "gpt-4 pairwise, swap averaged",
+        "setup": "with_ties",
+        "accuracy": 0.6687254351487928,
+        "ci": [
+          0.6468941966304035,
+          0.6909606975484092
+        ],
+        "n": 1781
+      },
+      {
+        "label": "gpt-4 single answer grading",
+        "setup": "with_ties",
+        "accuracy": 0.6792763157894737,
+        "ci": [
+          0.6532121739082201,
+          0.7054020960606698
+        ],
+        "n": 1216
+      },
+      {
+        "label": "length baseline",
+        "setup": "with_ties",
+        "accuracy": 0.4994487320837927,
+        "ci": [
+          0.4762954796030871,
+          0.5226019845644984
+        ],
+        "n": 1814
+      },
+      {
+        "label": "random baseline",
+        "setup": "with_ties",
+        "accuracy": 0.36108048511576624,
+        "ci": [
+          0.3390297684674752,
+          0.38313120176405735
+        ],
+        "n": 1814
+      }
+    ]
+  },
+  "agreement_on_local_subsample": [
+    {
+      "label": "human to human ceiling",
+      "setup": "no_ties",
+      "accuracy": NaN,
+      "ci": [
+        NaN,
+        NaN
+      ],
+      "n": 0,
+      "n_comparisons": 0
+    },
+    {
+      "label": "gpt-4 pairwise, one order",
+      "setup": "no_ties",
+      "accuracy": NaN,
+      "ci": [
+        NaN,
+        NaN
+      ],
+      "n": 0
+    },
+    {
+      "label": "gpt-4 pairwise, swap averaged",
+      "setup": "no_ties",
+      "accuracy": NaN,
+      "ci": [
+        NaN,
+        NaN
+      ],
+      "n": 0
+    },
+    {
+      "label": "gpt-4 single answer grading",
+      "setup": "no_ties",
+      "accuracy": NaN,
+      "ci": [
+        NaN,
+        NaN
+      ],
+      "n": 0
+    },
+    {
+      "label": "length baseline",
+      "setup": "no_ties",
+      "accuracy": NaN,
+      "ci": [
+        NaN,
+        NaN
+      ],
+      "n": 0
+    },
+    {
+      "label": "random baseline",
+      "setup": "no_ties",
+      "accuracy": NaN,
+      "ci": [
+        NaN,
+        NaN
+      ],
+      "n": 0
+    }
+  ],
+  "kappa": {
+    "gpt-4 pairwise, one order": {
+      "cohens_kappa": 0.4616940101758296,
+      "n": 1786
+    },
+    "gpt-4 pairwise, swap averaged": {
+      "cohens_kappa": 0.49864377747931066,
+      "n": 1781
+    },
+    "gpt-4 single answer grading": {
+      "cohens_kappa": 0.5116128906020702,
+      "n": 1216
+    },
+    "length baseline": {
+      "cohens_kappa": 0.2374386161308497,
+      "n": 1814
+    },
+    "random baseline": {
+      "cohens_kappa": 0.022073769630147077,
+      "n": 1814
+    }
+  },
+  "krippendorff": {
+    "humans_only": 0.4848956965883727,
+    "n_raters": 65,
+    "n_comparisons": 961,
+    "gpt-4 pairwise, one order": 0.4752034612982128,
+    "gpt-4 pairwise, swap averaged": 0.48552693544791103,
+    "length baseline": 0.3609064650773295
+  },
+  "position_bias": {
+    "gpt-4 pairwise": {
+      "n_comparisons": 1781,
+      "flip_rate": 0.16114542391914655,
+      "flip_ci": [
+        0.14430095451993263,
+        0.17798989331836046
+      ],
+      "position_one_rate": 0.5082539682539683,
+      "n_decided_presentations": 3150,
+      "tie_rate_order_ab": 0.1184727681078046,
+      "tie_rate_order_ba": 0.11173498034811903
+    },
+    "gpt-4 single answer grading": {
+      "note": "order free by construction: each response is graded on its own"
+    }
+  },
+  "rerun_stability": {
+    "judge": "gpt-4-0613-pair",
+    "n_judgments": 1320,
+    "same_verdict_rate": 0.8371212121212122,
+    "ci": [
+      0.8174242424242424,
+      0.8560606060606061
+    ],
+    "note": "same prompt, same model, two runs weeks apart"
+  },
+  "verbosity": {
+    "human majority": {
+      "label": "human majority",
+      "n": 1254,
+      "picks_longer_rate": 0.7057416267942583,
+      "picks_longer_ci": [
+        0.6802232854864434,
+        0.7304625199362041
+      ],
+      "corr_choice_lengthdiff": 0.2702301696158126,
+      "corr_p": 2.003552325831603e-22
+    },
+    "gpt-4 pairwise, one order": {
+      "label": "gpt-4 pairwise, one order",
+      "n": 1556,
+      "picks_longer_rate": 0.7069408740359897,
+      "picks_longer_ci": [
+        0.6844473007712082,
+        0.7294344473007712
+      ],
+      "corr_choice_lengthdiff": 0.2965750629767822,
+      "corr_p": 5.796258077905028e-33
+    },
+    "gpt-4 pairwise, swap averaged": {
+      "label": "gpt-4 pairwise, swap averaged",
+      "n": 1341,
+      "picks_longer_rate": 0.7472035794183445,
+      "picks_longer_ci": [
+        0.7233407904548844,
+        0.7703206562266965
+      ],
+      "corr_choice_lengthdiff": 0.32644293544012176,
+      "corr_p": 1.144572912608327e-34
+    },
+    "gpt-4 single answer grading": {
+      "label": "gpt-4 single answer grading",
+      "n": 934,
+      "picks_longer_rate": 0.7751605995717344,
+      "picks_longer_ci": [
+        0.7483940042826552,
+        0.8019271948608137
+      ],
+      "corr_choice_lengthdiff": 0.37126027270156914,
+      "corr_p": 6.759067932318723e-32
+    }
+  },
+  "self_preference": {
+    "gpt-4 judging gpt-4 responses": {
+      "label": "gpt-4 judging gpt-4 responses",
+      "n": 563,
+      "judge_win_rate_for_family": 0.8570159857904085,
+      "human_win_rate_for_family": 0.7291296625222025,
+      "difference": 0.12788632326820604,
+      "ci": [
+        0.0950266429840142,
+        0.16074600355239788
+      ]
+    },
+    "gpt-4 judging claude-v1 responses (control)": {
+      "label": "gpt-4 judging claude-v1 responses (control)",
+      "n": 586,
+      "judge_win_rate_for_family": 0.7167235494880546,
+      "human_win_rate_for_family": 0.6791808873720137,
+      "difference": 0.03754266211604096,
+      "ci": [
+        0.005972696245733822,
+        0.06825938566552903
+      ]
+    },
+    "note": "the qwen judge has no responses from its own family in this response set, so its self preference is not measurable here"
+  },
+  "leaderboards": {
+    "human majority": {
+      "win_rates": {
+        "alpaca-13b": 0.29381443298969073,
+        "claude-v1": 0.6776094276094277,
+        "gpt-3.5-turbo": 0.6430678466076696,
+        "gpt-4": 0.7249134948096886,
+        "llama-13b": 0.17757774140752863,
+        "vicuna-13b-v1.2": 0.4735042735042735
+      },
+      "ranking": [
+        "gpt-4",
+        "claude-v1",
+        "gpt-3.5-turbo",
+        "vicuna-13b-v1.2",
+        "alpaca-13b",
+        "llama-13b"
+      ],
+      "kendall_tau_vs_human": 0.9999999999999999,
+      "top_model": "gpt-4"
+    },
+    "gpt-4 pairwise, one order": {
+      "win_rates": {
+        "alpaca-13b": 0.23043478260869565,
+        "claude-v1": 0.7248722316865417,
+        "gpt-3.5-turbo": 0.6440422322775264,
+        "gpt-4": 0.8561278863232682,
+        "llama-13b": 0.10945273631840796,
+        "vicuna-13b-v1.2": 0.4354561101549053
+      },
+      "ranking": [
+        "gpt-4",
+        "claude-v1",
+        "gpt-3.5-turbo",
+        "vicuna-13b-v1.2",
+        "alpaca-13b",
+        "llama-13b"
+      ],
+      "kendall_tau_vs_human": 0.9999999999999999,
+      "top_model": "gpt-4"
+    },
+    "gpt-4 pairwise, swap averaged": {
+      "win_rates": {
+        "alpaca-13b": 0.23647469458987783,
+        "claude-v1": 0.7167235494880546,
+        "gpt-3.5-turbo": 0.6181818181818182,
+        "gpt-4": 0.8570159857904085,
+        "llama-13b": 0.11480865224625623,
+        "vicuna-13b-v1.2": 0.459412780656304
+      },
+      "ranking": [
+        "gpt-4",
+        "claude-v1",
+        "gpt-3.5-turbo",
+        "vicuna-13b-v1.2",
+        "alpaca-13b",
+        "llama-13b"
+      ],
+      "kendall_tau_vs_human": 0.9999999999999999,
+      "top_model": "gpt-4"
+    },
+    "gpt-4 single answer grading": {
+      "win_rates": {
+        "alpaca-13b": 0.2224622030237581,
+        "claude-v1": 0.7053388090349076,
+        "gpt-3.5-turbo": 0.6679462571976967,
+        "gpt-4": 0.7918410041841004,
+        "llama-13b": 0.08902691511387163
+      },
+      "ranking": [
+        "gpt-4",
+        "claude-v1",
+        "gpt-3.5-turbo",
+        "alpaca-13b",
+        "llama-13b"
+      ],
+      "kendall_tau_vs_human": 0.9999999999999999,
+      "top_model": "gpt-4"
+    },
+    "length baseline": {
+      "win_rates": {
+        "alpaca-13b": 0.16494845360824742,
+        "claude-v1": 0.6599326599326599,
+        "gpt-3.5-turbo": 0.5730088495575221,
+        "gpt-4": 0.6704152249134948,
+        "llama-13b": 0.25859247135842883,
+        "vicuna-13b-v1.2": 0.67008547008547
+      },
+      "ranking": [
+        "gpt-4",
+        "vicuna-13b-v1.2",
+        "claude-v1",
+        "gpt-3.5-turbo",
+        "llama-13b",
+        "alpaca-13b"
+      ],
+      "kendall_tau_vs_human": 0.6,
+      "top_model": "gpt-4"
+    },
+    "random baseline": {
+      "win_rates": {
+        "alpaca-13b": 0.4725085910652921,
+        "claude-v1": 0.4713804713804714,
+        "gpt-3.5-turbo": 0.5,
+        "gpt-4": 0.5380622837370242,
+        "llama-13b": 0.49918166939443537,
+        "vicuna-13b-v1.2": 0.5196581196581197
+      },
+      "ranking": [
+        "gpt-4",
+        "vicuna-13b-v1.2",
+        "gpt-3.5-turbo",
+        "llama-13b",
+        "alpaca-13b",
+        "claude-v1"
+      ],
+      "kendall_tau_vs_human": 0.2,
+      "top_model": "gpt-4"
+    }
+  },
+  "mitigations": [
+    {
+      "mitigation": "gpt-4: swap averaging",
+      "baseline_accuracy": 0.8538851351351351,
+      "mitigated_accuracy": 0.883177570093458,
+      "delta": 0.0292924349583229,
+      "ci": [
+        0.01930338491884527,
+        0.04004384474598273
+      ],
+      "n_comparisons": 1781,
+      "coverage_before": 0.664795058955643,
+      "coverage_after": 0.60078607523863
+    }
+  ],
+  "cost": [
+    {
+      "judge_id": "gpt-4-0613-pair",
+      "mean_input_tokens": 987.9450101832994,
+      "mean_output_tokens": 147.71568228105906,
+      "judgments_cached": 4910,
+      "usd_per_1000_judgments": 38.50129124236253,
+      "usd_per_1000_comparisons_swapped": 77.00258248472505,
+      "token_counts_estimated": true
+    },
+    {
+      "judge_id": "gpt-4-0613-single",
+      "mean_input_tokens": 1258.4194078947369,
+      "mean_output_tokens": 351.1957236842105,
+      "judgments_cached": 1216,
+      "usd_per_1000_judgments": 58.82432565789474,
+      "usd_per_1000_comparisons_swapped": 117.64865131578948,
+      "token_counts_estimated": true
+    }
+  ]
+}

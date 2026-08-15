@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 1141, "item_id": "q103-t2-alpaca-13b-vicuna-13b-v1.2", "judge_id": "qwen2.5-3b-4bit-local", "key": "8a3b2552e841eb59b029fd53b344fb900f318ab7f4b379f62c3dcdfe3a1706a2", "latency_s": 1.4094150830060244, "order": "ab", "out_tokens": 3, "sample": 2, "template": "rubric", "text": "[[B]]", "verdict": "second"}

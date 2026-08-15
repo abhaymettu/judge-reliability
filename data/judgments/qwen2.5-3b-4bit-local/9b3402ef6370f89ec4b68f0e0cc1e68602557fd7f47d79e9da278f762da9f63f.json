@@ -1,0 +1,1 @@
+{"condition": "padded", "in_tokens": 598, "item_id": "q107-t2-alpaca-13b-vicuna-13b-v1.2", "judge_id": "qwen2.5-3b-4bit-local", "key": "9b3402ef6370f89ec4b68f0e0cc1e68602557fd7f47d79e9da278f762da9f63f", "latency_s": 0.9178129170322791, "order": "ba", "out_tokens": 3, "sample": 0, "template": "rubric", "text": "[[A]]", "verdict": "first"}
