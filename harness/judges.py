@@ -170,6 +170,8 @@ def run(backend, judge_id, template, prompt, sample=0, temperature=0.0, cache_ro
     key = cache.cache_key(judge_id, template, prompt, sample)
     hit = cache.get(judge_id, key, cache_root)
     if hit is not None:
+        if extra and cache.add_context(hit, extra):
+            cache.put(judge_id, key, hit, cache_root)
         return hit
     out = backend.complete(
         prompt, prompts.MAX_TOKENS[template], temperature=temperature, seed=1000 + sample
@@ -185,7 +187,8 @@ def run(backend, judge_id, template, prompt, sample=0, temperature=0.0, cache_ro
         "out_tokens": out["out_tokens"],
         "latency_s": out["latency_s"],
     }
-    record.update(extra or {})
+    if extra:
+        cache.add_context(record, extra)
     cache.put(judge_id, key, record, cache_root)
     return record
 

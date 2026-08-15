@@ -219,6 +219,31 @@ def test_cache_key():
     finally:
         shutil.rmtree(root)
 
+    # When a comparison's two responses are byte identical, both orders render
+    # the same prompt and land on the same cache key. The answer really is the
+    # same, but both contexts have to survive or the comparison silently
+    # disappears from the analysis. This regression cost 28 comparisons once.
+    root = tempfile.mkdtemp()
+    try:
+        class OneAnswer:
+            def complete(self, prompt, max_tokens, temperature=0.0, seed=0):
+                return {"text": "[[C]]", "in_tokens": 1, "out_tokens": 1, "latency_s": 0.0}
+
+        for order in ("ab", "ba"):
+            record = judges.run(
+                OneAnswer(), "collide", "bare", "identical prompt", cache_root=root,
+                extra={"item_id": "q1-t1-x-y", "order": order, "condition": "base"},
+            )
+        contexts = record["contexts"]
+        check("both orders are remembered on one cached answer", len(contexts) == 2, contexts)
+        check(
+            "both orders name the same comparison",
+            {c["order"] for c in contexts} == {"ab", "ba"} and {c["item_id"] for c in contexts} == {"q1-t1-x-y"},
+        )
+        check("the collision stores one file, not two", len(cache.load_all("collide", root)) == 1)
+    finally:
+        shutil.rmtree(root)
+
     # A judge is never called twice for the same prompt.
     calls = []
 

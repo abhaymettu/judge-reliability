@@ -58,20 +58,25 @@ def load_verdicts(judge_id):
         )
     rows = []
     for r in records:
-        rows.append(
-            {
-                "item_id": r["item_id"],
-                "order": r["order"],
-                "template": r["template"],
-                "sample": r["sample"],
-                "condition": r.get("condition", "base"),
-                "verdict": r["verdict"],
-                "choice": canonical(r["verdict"], r["order"]),
-                "in_tokens": r["in_tokens"],
-                "out_tokens": r["out_tokens"],
-                "latency_s": r["latency_s"],
-            }
-        )
+        # One cached answer can serve several contexts, which happens when both
+        # presentation orders render to the same prompt. Expanding here is what
+        # keeps those comparisons in the analysis instead of silently dropping
+        # them. See harness/cache.py.
+        for context in r.get("contexts", []):
+            rows.append(
+                {
+                    "item_id": context["item_id"],
+                    "order": context["order"],
+                    "template": r["template"],
+                    "sample": r["sample"],
+                    "condition": context.get("condition", "base"),
+                    "verdict": r["verdict"],
+                    "choice": canonical(r["verdict"], context["order"]),
+                    "in_tokens": r["in_tokens"],
+                    "out_tokens": r["out_tokens"],
+                    "latency_s": r["latency_s"],
+                }
+            )
     return pd.DataFrame(rows)
 
 

@@ -2,8 +2,10 @@
 
 Palette is the three validated categorical slots (blue, orange, aqua) used by
 role, not by rank: blue is always an LLM judge, orange always a non LLM
-baseline, aqua always a human reference line. Every bar carries its value as a
-direct label, so nothing is encoded in colour alone.
+baseline, aqua always a human reference line. The one exception is the mitigation
+chart, where the same two hues mean "interval clears zero" and "does not", which
+is a different job. Every bar carries its value as a direct label, so nothing is
+encoded in colour alone.
 """
 
 import json
@@ -151,24 +153,27 @@ def fig_verbosity(m):
 
 
 def fig_prompt_sensitivity(m):
+    """One line per judge prompt, all from the same model on the same comparisons.
+    Swap averaged configurations are deliberately absent: this figure answers
+    "what does the prompt alone do", and a mitigation would muddy that."""
     boards = m["leaderboards"]
     human = boards["human majority"]["win_rates"]
-    keep = [k for k in boards if k.startswith("local 3B") or k == "gpt-4 pairwise, one order"]
-    if not any(k.startswith("local 3B") for k in keep):
-        keep = [k for k in boards if k != "human majority"]
-    keep.sort()
+    prompts_shown = sorted(
+        k for k in boards if k.startswith("local 3B") and k.endswith("one order")
+    )
+    if not prompts_shown:
+        prompts_shown = [k for k in boards if k.startswith("gpt-4")]
     models = sorted(human, key=human.get, reverse=True)
 
     fig, ax = plt.subplots(figsize=(8.6, 4.4))
     x = range(len(models))
-    ax.plot(x, [human[m_] for m_ in models], marker="o", markersize=7, linewidth=2,
+    ax.plot(x, [human[m_] for m_ in models], marker="o", markersize=7, linewidth=2.4,
             color=HUMAN, label="human majority", zorder=5)
-    styles = [(JUDGE, "-"), (JUDGE, "--"), (JUDGE, ":"), (BASELINE, "-"), (BASELINE, "--")]
-    for i, key in enumerate(keep):
+    for dash, key in zip(["-", "--", ":", "-."], prompts_shown):
         board = boards[key]["win_rates"]
-        colour, dash = styles[i % len(styles)]
         ax.plot(x, [board.get(m_, float("nan")) for m_ in models], marker="o", markersize=6,
-                linewidth=1.6, linestyle=dash, color=colour, alpha=0.9, label=key)
+                linewidth=1.7, linestyle=dash, color=JUDGE,
+                label=key.replace("local 3B, ", "").replace(", one order", ""))
     ax.set_xticks(list(x), models, rotation=20, ha="right")
     as_percent(ax.yaxis)
     ax.set_ylabel("win rate over all comparisons")

@@ -1,7 +1,7 @@
 # judge-reliability
 
 **Across 1814 human labelled MT-Bench comparisons, GPT-4 judging a
-pair of answers agrees with the human majority 85.4 percent of the time,
+pair of answers agrees with the human majority 85.5 percent of the time,
 against a human ceiling of 88.2 percent and a length only baseline that
 reaches 70.6 percent. Reversing the order the two answers are shown in
 flips the verdict on 16.1 percent of comparisons, and swap averaging
@@ -9,7 +9,7 @@ recovers 2.9 points of agreement, which is most of the gap
 to the ceiling.**
 
 The judge is good. It is also not better than a careful human, it is only
-14.8 points better than a rule that reads none
+14.9 points better than a rule that reads none
 of the text and always picks the longer answer, and its order sensitivity turns out to
 be indistinguishable from its own run to run noise. Those three facts are the reason to
 measure a judge rather than assume one.
@@ -40,7 +40,7 @@ key, no model call, no network beyond the initial public data download.
   which is what makes a ceiling possible.
 - **Judges**: GPT-4 (0613) pairwise in both presentation orders and GPT-4 single answer
   grading, both from the judgments LMSYS released with MT-Bench, plus a local
-  Qwen2.5 3B judge run here on a laptop over a seeded subsample of 118 of them, plus two
+  Qwen2.5 3B judge run here on a laptop over a seeded subsample of 303 of them, plus two
   non LLM baselines: always prefer the longer answer, and a coin flip.
 
 ## 1. Agreement, and the ceiling that gives it meaning
@@ -52,16 +52,16 @@ a judge that abstains more is scored on fewer and easier comparisons.
 
 | configuration | agreement | 95 percent CI | comparisons scored |
 | --- | --- | --- | --- |
-| gpt-4 single answer grading | 91.4 | 89.4 to 93.4 | 747 |
-| gpt-4 pairwise, swap averaged | 88.3 | 86.3 to 90.2 | 1070 |
+| gpt-4 single answer grading | 91.5 | 89.4 to 93.4 | 752 |
+| gpt-4 pairwise, swap averaged | 88.4 | 86.4 to 90.3 | 1078 |
 | human ceiling, one annotator vs the majority of the others | 88.2 | 85.0 to 91.1 | 752 |
-| gpt-4 pairwise, one order | 85.4 | 83.4 to 87.4 | 1184 |
+| gpt-4 pairwise, one order | 85.5 | 83.5 to 87.5 | 1192 |
 | human to human ceiling | 82.7 | 80.0 to 85.5 | 1550 |
+| local 3B, rubric prompt, swap averaged | 71.5 | 63.6 to 79.0 | 130 |
 | length baseline | 70.6 | 68.0 to 73.1 | 1254 |
-| local 3B, bare prompt, one order | 63.9 | 52.7 to 74.6 | 72 |
-| local 3B, rubric prompt, swap averaged | 61.7 | 47.2 to 75.5 | 47 |
-| local 3B, rubric prompt, one order | 61.6 | 50.0 to 72.5 | 73 |
-| local 3B, cot prompt, one order | 58.5 | 44.9 to 72.0 | 53 |
+| local 3B, bare prompt, one order | 67.5 | 61.1 to 73.6 | 212 |
+| local 3B, cot prompt, one order | 66.9 | 59.8 to 73.9 | 175 |
+| local 3B, rubric prompt, one order | 60.4 | 53.9 to 66.8 | 222 |
 | random baseline | 51.9 | 49.1 to 54.6 | 1262 |
 
 Two ceilings, because the obvious one is unfair to humans. Annotator against
@@ -69,33 +69,33 @@ annotator is 82.7 percent, which is what people usually quote.
 But a judge is scored against the *majority* of several annotators, a denoised
 label, so the like for like number is one annotator against the majority of the
 others: 88.2 percent (85.0 to 91.1). Quote the first and GPT-4
-looks superhuman. Quote the second and it lands 2.8
+looks superhuman. Quote the second and it lands 2.7
 points short, and swap averaging closes that gap.
 
 Cohen's kappa tells the same story with the chance agreement taken out:
-0.46 for GPT-4 against
+0.47 for GPT-4 against
 0.24 for the length rule and
 0.02 for the coin. Krippendorff's alpha
 over the 65 human annotators is
 0.485; adding GPT-4 to the annotator pool moves it to
-0.475. On this evidence GPT-4 is about as
+0.477. On this evidence GPT-4 is about as
 agreeable as one more human annotator, no more and no less.
 
 Same table, ties kept and counted as a third label:
 
 | configuration | agreement | 95 percent CI | comparisons scored |
 | --- | --- | --- | --- |
-| gpt-4 single answer grading | 67.9 | 65.3 to 70.5 | 1216 |
-| gpt-4 pairwise, swap averaged | 66.9 | 64.7 to 69.1 | 1781 |
+| gpt-4 single answer grading | 68.1 | 65.5 to 70.7 | 1229 |
+| gpt-4 pairwise, swap averaged | 67.3 | 65.2 to 69.5 | 1814 |
 | human to human ceiling | 65.5 | 62.7 to 68.5 | 2368 |
+| gpt-4 pairwise, one order | 65.0 | 62.8 to 67.3 | 1814 |
 | human ceiling, one annotator vs the majority of the others | 64.9 | 60.8 to 68.9 | 1380 |
-| gpt-4 pairwise, one order | 64.8 | 62.5 to 67.1 | 1786 |
+| local 3B, bare prompt, one order | 50.2 | 44.6 to 55.8 | 303 |
 | length baseline | 49.9 | 47.6 to 52.3 | 1814 |
-| local 3B, bare prompt, one order | 39.8 | 31.4 to 48.3 | 118 |
-| local 3B, rubric prompt, one order | 38.1 | 29.7 to 46.6 | 118 |
+| local 3B, cot prompt, one order | 48.6 | 42.4 to 54.9 | 247 |
+| local 3B, rubric prompt, one order | 44.7 | 39.3 to 50.3 | 302 |
+| local 3B, rubric prompt, swap averaged | 41.4 | 35.8 to 46.9 | 302 |
 | random baseline | 36.1 | 33.9 to 38.3 | 1814 |
-| local 3B, rubric prompt, swap averaged | 35.6 | 27.1 to 44.1 | 118 |
-| local 3B, cot prompt, one order | 33.7 | 24.5 to 43.3 | 98 |
 
 ## 2. Position bias, next to the judge's own noise
 
@@ -104,18 +104,18 @@ Every comparison is judged twice, once in each order.
 ![position bias flip rates](output/figures/fig2_position_bias.png)
 
 - Order reversal flips the verdict on **16.1 percent**
-  (14.4 to 17.8) of 1781 comparisons.
+  (14.4 to 17.8) of 1814 comparisons.
 - There is **no directional preference**: across
-  3150 decided presentations the judge picks whichever
-  answer was shown first 50.8 percent of the time. A coin does
+  3177 decided presentations the judge picks whichever
+  answer was shown first 50.7 percent of the time. A coin does
   that. The bias is instability, not a thumb on the first position.
 - GPT-4 single answer grading has no position bias at all, because it never sees
   the two answers together.
 
-The number that puts the flip rate in perspective: 1320 of these
+The number that puts the flip rate in perspective: 1356 of these
 judgments exist twice in the released files, same prompt, same model, runs weeks
-apart. GPT-4 agrees with itself on 83.7 percent of them, so it
-**disagrees with itself 16.3 percent of the time with nothing
+apart. GPT-4 agrees with itself on 83.8 percent of them, so it
+**disagrees with itself 16.2 percent of the time with nothing
 changed at all**. The 16.1 percent flip rate under order reversal is the
 same size. Whatever swap averaging is buying here, it is variance reduction, not the
 removal of a directional bias.
@@ -124,8 +124,8 @@ removal of a directional bias.
 
 ![how often each judge picks the longer answer](output/figures/fig3_verbosity.png)
 
-GPT-4 picks the longer answer 70.7 percent of the time
-(r = 0.30 between its choice and the length
+GPT-4 picks the longer answer 70.5 percent of the time
+(r = 0.29 between its choice and the length
 difference). The humans pick the longer answer 70.6 percent of
 the time (r = 0.27). Those are the same number.
 
@@ -139,9 +139,9 @@ frontier judge achieves is achievable by counting characters.
 
 The controlled version holds quality fixed: pad the shorter answer with content
 free filler until it is half again as long as the longer one, and see whether the
-verdict moves. On 99 comparisons where the local judge preferred the other
+verdict moves. On 259 comparisons where the local judge preferred the other
 answer before padding, it moved to the padded answer
-**4.0 percent** of the time (1.0 to 8.1).
+**3.1 percent** of the time (1.2 to 5.4).
 
 ## 4. Self preference
 
@@ -150,12 +150,12 @@ humans scored the same comparisons:
 
 | | judge win rate for the family | human win rate | gap | 95 percent CI | comparisons |
 | --- | --- | --- | --- | --- | --- |
-| gpt-4 judging gpt-4 | 85.7 | 72.9 | +12.8 | 9.5 to 16.1 | 563 |
-| gpt-4 judging claude-v1 (control) | 71.7 | 67.9 | +3.8 | 0.6 to 6.8 | 586 |
+| gpt-4 judging gpt-4 | 85.2 | 72.5 | +12.7 | 9.5 to 16.0 | 578 |
+| gpt-4 judging claude-v1 (control) | 71.6 | 67.8 | +3.9 | 0.8 to 7.0 | 594 |
 
-GPT-4 rates its own family 12.8 points higher than the humans
+GPT-4 rates its own family 12.7 points higher than the humans
 do, more than three times the gap it shows for a family it has no stake in. The
-interval excludes zero. It is a real effect on 563 comparisons, and it is
+interval excludes zero. It is a real effect on 578 comparisons, and it is
 still one judge, one response set and one point in time, so read
 `LIMITATIONS.md` before quoting it. It cannot be separated here from stylistic
 kinship: GPT-4 may simply favour answers that look like its own.
@@ -164,29 +164,36 @@ kinship: GPT-4 may simply favour answers that look like its own.
 
 The judge prompt is a free parameter that teams pick by taste. Here are three,
 identical except for scaffolding, run by the same local Qwen2.5 3B model over the
-same 118 comparisons: a bare instruction, a rubric with an
-explicit warning about length and order, and a chain of thought prompt.
+same 303 comparisons in both orders: a bare instruction, a
+rubric that spells out criteria and explicitly warns against rewarding length or
+position, and a chain of thought prompt that reasons before committing.
 
 ![model win rates by judge prompt](output/figures/fig4_prompt_sensitivity.png)
 
 | judge prompt | agreement | 95 percent CI | comparisons scored |
 | --- | --- | --- | --- |
-| bare prompt, one order | 63.9 | 52.7 to 74.6 | 72 |
-| rubric prompt, swap averaged | 61.7 | 47.2 to 75.5 | 47 |
-| rubric prompt, one order | 61.6 | 50.0 to 72.5 | 73 |
-| cot prompt, one order | 58.5 | 44.9 to 72.0 | 53 |
+| bare | 67.5 | 61.1 to 73.6 | 212 |
+| cot | 66.9 | 59.8 to 73.9 | 175 |
+| rubric | 60.4 | 53.9 to 66.8 | 222 |
 
-Changing nothing but the judge prompt moves agreement by
-5.4 points, from 58.5 to
-63.9. Kendall tau between each prompt's model ranking and the human
-ranking: bare prompt 0.60, cot prompt 0.47, rubric prompt 0.60, rubric prompt 0.47. The model at the top of the leaderboard under each prompt:
-bare prompt, one order picks gpt-4, cot prompt, one order picks claude-v1, rubric prompt, one order picks gpt-4, rubric prompt, swap averaged picks vicuna-13b-v1.2.
+**Changing nothing but the judge prompt moves the model at the top of the
+leaderboard.** Over the same responses and the same comparisons, the bare prompt picks gpt-4, the cot prompt picks claude-v1, the rubric prompt picks claude-v1. The
+humans on these comparisons pick gpt-4. Kendall tau against the human
+ranking: bare 0.73, cot 0.73, rubric 0.60.
 
-On the same 118 comparisons GPT-4 scores
-82.8, so the gap between a frontier judge and a laptop judge is
-real and large. What the local judge adds is the sensitivity measurement: it is
-cheap enough to run under every prompt variant, which is the experiment a team
-actually needs before trusting a leaderboard.
+Agreement moves 7.1 points across the three
+prompts, from 60.4 for the rubric prompt to
+67.5 for the bare prompt. The direction is the
+surprise: the rubric is the prompt that tells the judge in as many words not to
+reward length or position, and it is the worst of the three. Scaffolding that
+sounds like it should help is exactly the kind of thing that has to be measured.
+
+For scale, on these same 303 comparisons GPT-4 scores
+82.9 and the length rule scores 68.3.
+Every prompt variant of the 3B judge sits at or below the length rule. What the
+local judge contributes is not accuracy, it is that it is cheap enough to run
+under every prompt variant, which is the experiment a team needs before trusting
+any leaderboard a judge produces.
 
 ## 6. Mitigations, measured rather than assumed
 
@@ -194,16 +201,16 @@ actually needs before trusting a leaderboard.
 
 | mitigation | before | after | change | 95 percent CI | comparisons scored before and after |
 | --- | --- | --- | --- | --- | --- |
-| gpt-4: swap averaging | 85.4 | 88.3 | +2.9 | 1.9 to 4.0 | 66 percent to 60 percent |
-| local 3B: rubric prompt instead of bare | 63.9 | 61.6 | -2.2 | -11.6 to 7.0 | 61 percent to 62 percent |
-| local 3B: chain of thought prompt instead of bare | 63.9 | 58.5 | -5.4 | -21.8 to 10.9 | 61 percent to 45 percent |
-| local 3B: swap averaging | 61.6 | 61.7 | +0.1 | -8.6 to 8.7 | 62 percent to 40 percent |
-| local 3B: majority vote over 3 samples | 61.1 | 61.1 | +0.0 | 0.0 to 0.0 | 62 percent to 62 percent |
+| gpt-4: swap averaging | 85.5 | 88.4 | +2.9 | 1.9 to 4.0 | 66 percent to 59 percent |
+| local 3B: rubric prompt instead of bare | 67.5 | 60.4 | -7.1 | -12.6 to -1.8 | 70 percent to 73 percent |
+| local 3B: chain of thought prompt instead of bare | 67.5 | 66.9 | -0.6 | -9.1 to 7.8 | 70 percent to 58 percent |
+| local 3B: swap averaging | 60.4 | 71.5 | +11.2 | 5.6 to 16.9 | 73 percent to 43 percent |
+| local 3B: majority vote over 3 samples | 60.4 | 59.8 | -0.5 | -1.4 to 0.0 | 73 percent to 74 percent |
 
 Swap averaging is the one that works, and it is not free: it doubles the number
 of model calls and it converts every order disagreement into a tie, so coverage
 drops from 66 percent of comparisons to
-60 percent. You are buying accuracy with abstention as
+59 percent. You are buying accuracy with abstention as
 much as with debiasing, which is fine as long as you know that is the trade.
 
 ## 7. Cost against reliability
@@ -212,9 +219,9 @@ much as with debiasing, which is fine as long as you know that is the trade.
 
 | judge | mean input tokens | mean output tokens | USD per 1000 judgments | median latency |
 | --- | --- | --- | --- | --- |
-| gpt-4-0613-pair | 988 | 148 | 38.50 (estimated) | not recorded |
-| gpt-4-0613-single | 1258 | 351 | 58.82 (estimated) | not recorded |
-| qwen2.5-3b-4bit-local | 799 | 47 | 0.00 | 1.70 s |
+| gpt-4-0613-pair | 979 | 147 | 38.18 (estimated) | not recorded |
+| gpt-4-0613-single | 1253 | 350 | 58.61 (estimated) | not recorded |
+| qwen2.5-3b-4bit-local | 927 | 51 | 0.00 | 1.69 s |
 
 Token counts for the released GPT-4 judgments are estimated from character
 counts and priced at gpt-4-0613 list prices, so treat that column as an order of
@@ -224,35 +231,42 @@ magnitude. Swap averaging doubles it.
 
 1. **Order sensitivity is not a bias, it is noise.** GPT-4 flips on
    16.1 percent of comparisons when the order is reversed, and disagrees
-   with itself on 16.3 percent of identical reruns. There is no
+   with itself on 16.2 percent of identical reruns. There is no
    directional preference for position one to remove
-   (50.8 percent, which is a coin). Swap averaging helps because
+   (50.7 percent, which is a coin). Swap averaging helps because
    averaging two noisy draws helps.
 2. **The length baseline is closer than it should be.** Always preferring the
    longer answer agrees with humans 70.6 percent of the time, reaching
    83 percent of what GPT-4 achieves while reading
    none of the text. Any judge evaluation without this baseline in it is not
    telling you what the judge contributes.
-3. **The judge is not better than a person.** 85.4 percent against a like
+3. **The judge is not better than a person.** 85.5 percent against a like
    for like human ceiling of 88.2 percent. The commonly quoted comparison,
    against raw annotator to annotator agreement of 82.7 percent, makes
    the judge look superhuman and is the wrong comparison.
-4. **The judge is partial to itself**, by 12.8 points against
-   the human labels on 563 comparisons, more than three times the gap for a
+4. **The judge is partial to itself**, by 12.7 points against
+   the human labels on 578 comparisons, more than three times the gap for a
    family it has no stake in.
 5. **The best scoring configuration scores best partly by abstaining.** GPT-4
-   single answer grading reaches 91.4 percent, the highest number in
-   the repo, on 747 comparisons rather than 1184. Read coverage
+   single answer grading reaches 91.5 percent, the highest number in
+   the repo, on 752 comparisons rather than 1192. Read coverage
    next to accuracy or that number is a mirage.
-6. **The small local judge does not beat the length baseline.** Its best prompt
-   reaches 63.9 percent on the subsample where the length rule reaches
-   67.1 percent. On this evidence a 3B judge on these comparisons is
+6. **No prompt variant of the small local judge beats the length baseline.** Its
+   best prompt reaches 67.5 percent on the subsample where the length
+   rule reaches 68.3 percent. Only after swap averaging does it edge
+   past, to 71.5 percent on 130 comparisons rather
+   than 212. On this evidence a 3B judge on these comparisons is mostly
    measuring verbosity and noise, and should not be shipped as an evaluator.
-7. **Chain of thought made the local judge less stable, not more.** Under
+7. **Chain of thought made the local judge less stable, not more.** Under the
    cot prompt the verdict reverses on
-   52.5 percent of comparisons when the order is reversed, worse
-   than the same model given a bare instruction. Reasoning traces are not free
+   53.1 percent of comparisons when the order is reversed, worse than a coin, and it is the one prompt with a real thumb on the
+   scale: it picks whichever answer came first
+   61.7 percent of the time. Reasoning traces are not free
    reliability.
+8. **The rubric that warns against length and position bias made agreement
+   worse.** Swapping the bare prompt for the rubric costs the local judge
+   7.1 points, interval excluding zero. Telling a judge not to be biased is not a
+   mitigation until it has been measured as one.
 
 ## Reproduce
 

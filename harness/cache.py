@@ -37,6 +37,23 @@ def get(judge_id, key, root=None):
         return None
 
 
+def add_context(record, context):
+    """Attach one (item, order, condition) that this judgment answers.
+
+    A single cached answer can serve more than one context. It happens whenever
+    the two orders of a comparison render to the same prompt, which is exactly
+    when the two responses are byte identical. Keying on the prompt is still
+    right, the answer really is the same, but the record has to remember both
+    contexts or the comparison quietly disappears from the analysis.
+    """
+    contexts = record.setdefault("contexts", [])
+    if context not in contexts:
+        contexts.append(context)
+        contexts.sort(key=lambda c: (c.get("item_id", ""), c.get("order", ""), c.get("condition", "")))
+        return True
+    return False
+
+
 def put(judge_id, key, record, root=None):
     path = _path(judge_id, key, root)
     os.makedirs(os.path.dirname(path), exist_ok=True)

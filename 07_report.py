@@ -226,20 +226,29 @@ kinship: GPT-4 may simply favour answers that look like its own.
 
     boards = m["leaderboards"]
     if has_local:
-        local_boards = {k: v for k, v in boards.items() if k.startswith("local 3B")}
-        tops = {k: v["top_model"] for k, v in local_boards.items()}
-        taus = ", ".join(f"{k.split(', ')[1]} {v['kendall_tau_vs_human']:.2f}" for k, v in local_boards.items())
-        best = max(local_rows, key=lambda r: r["accuracy"])
-        worst = min(local_rows, key=lambda r: r["accuracy"])
+        # Prompt alone means one order, one sample. The swap averaged row is a
+        # mitigation and belongs in section 6, not in a claim about prompts.
+        prompt_rows = [r for r in local_rows if r["label"].endswith("one order")]
+        short = lambda label: label.replace("local 3B, ", "").replace(", one order", "").replace(" prompt", "")
+        prompt_boards = {
+            short(k): v for k, v in boards.items() if k.startswith("local 3B") and k.endswith("one order")
+        }
+        taus = ", ".join(f"{k} {v['kendall_tau_vs_human']:.2f}" for k, v in prompt_boards.items())
+        tops = ", ".join(f"the {k} prompt picks {v['top_model']}" for k, v in prompt_boards.items())
+        best = max(prompt_rows, key=lambda r: r["accuracy"])
+        worst = min(prompt_rows, key=lambda r: r["accuracy"])
+        human_top = boards["human majority, local subsample"]["top_model"]
         local_gpt4 = find(m["agreement_on_local_subsample"], "gpt-4 pairwise, one order")
+        local_length = find(m["agreement_on_local_subsample"], "length baseline")
         parts.append(
             f"""
 ## 5. Prompt sensitivity
 
 The judge prompt is a free parameter that teams pick by taste. Here are three,
 identical except for scaffolding, run by the same local Qwen2.5 3B model over the
-same {data['local_judge_subsample']} comparisons: a bare instruction, a rubric with an
-explicit warning about length and order, and a chain of thought prompt.
+same {data['local_judge_subsample']} comparisons in both orders: a bare instruction, a
+rubric that spells out criteria and explicitly warns against rewarding length or
+position, and a chain of thought prompt that reasons before committing.
 
 ![model win rates by judge prompt](output/figures/fig4_prompt_sensitivity.png)
 
@@ -247,22 +256,29 @@ explicit warning about length and order, and a chain of thought prompt.
 | --- | --- | --- | --- |
 """
             + "\n".join(
-                f"| {r['label'].replace('local 3B, ', '')} | {num(r['accuracy'])} | {interval(r)} | {r['n']} |"
-                for r in sorted(local_rows, key=lambda r: -r["accuracy"])
+                f"| {short(r['label'])} | {num(r['accuracy'])} | {interval(r)} | {r['n']} |"
+                for r in sorted(prompt_rows, key=lambda r: -r["accuracy"])
             )
             + f"""
 
-Changing nothing but the judge prompt moves agreement by
-{num(best['accuracy'] - worst['accuracy'])} points, from {num(worst['accuracy'])} to
-{num(best['accuracy'])}. Kendall tau between each prompt's model ranking and the human
-ranking: {taus}. The model at the top of the leaderboard under each prompt:
-{', '.join(f"{k.replace('local 3B, ', '')} picks {v}" for k, v in tops.items())}.
+**Changing nothing but the judge prompt moves the model at the top of the
+leaderboard.** Over the same responses and the same comparisons, {tops}. The
+humans on these comparisons pick {human_top}. Kendall tau against the human
+ranking: {taus}.
 
-On the same {data['local_judge_subsample']} comparisons GPT-4 scores
-{num(local_gpt4['accuracy'])}, so the gap between a frontier judge and a laptop judge is
-real and large. What the local judge adds is the sensitivity measurement: it is
-cheap enough to run under every prompt variant, which is the experiment a team
-actually needs before trusting a leaderboard.
+Agreement moves {num(best['accuracy'] - worst['accuracy'])} points across the three
+prompts, from {num(worst['accuracy'])} for the {short(worst['label'])} prompt to
+{num(best['accuracy'])} for the {short(best['label'])} prompt. The direction is the
+surprise: the rubric is the prompt that tells the judge in as many words not to
+reward length or position, and it is the worst of the three. Scaffolding that
+sounds like it should help is exactly the kind of thing that has to be measured.
+
+For scale, on these same {data['local_judge_subsample']} comparisons GPT-4 scores
+{num(local_gpt4['accuracy'])} and the length rule scores {num(local_length['accuracy'])}.
+Every prompt variant of the 3B judge sits at or below the length rule. What the
+local judge contributes is not accuracy, it is that it is cheap enough to run
+under every prompt variant, which is the experiment a team needs before trusting
+any leaderboard a judge produces.
 """
         )
     else:
@@ -328,21 +344,31 @@ magnitude. Swap averaging doubles it.
 
     extra_finding = ""
     if has_local:
-        best_local = max(local_rows, key=lambda r: r["accuracy"])
+        best_prompt = max(
+            (r for r in local_rows if r["label"].endswith("one order")), key=lambda r: r["accuracy"]
+        )
+        swapped_local = find(no_ties, "local 3B, rubric prompt, swap averaged")
         local_length = find(m["agreement_on_local_subsample"], "length baseline")
         local_flips = {
             k: v for k, v in m["position_bias"].items() if k.startswith("local 3B") and "flip_rate" in v
         }
         worst_flip = max(local_flips.items(), key=lambda kv: kv[1]["flip_rate"])
-        extra_finding = f"""6. **The small local judge does not beat the length baseline.** Its best prompt
-   reaches {pct(best_local['accuracy'])} on the subsample where the length rule reaches
-   {pct(local_length['accuracy'])}. On this evidence a 3B judge on these comparisons is
+        extra_finding = f"""6. **No prompt variant of the small local judge beats the length baseline.** Its
+   best prompt reaches {pct(best_prompt['accuracy'])} on the subsample where the length
+   rule reaches {pct(local_length['accuracy'])}. Only after swap averaging does it edge
+   past, to {pct(swapped_local['accuracy'])} on {swapped_local['n']} comparisons rather
+   than {best_prompt['n']}. On this evidence a 3B judge on these comparisons is mostly
    measuring verbosity and noise, and should not be shipped as an evaluator.
-7. **Chain of thought made the local judge less stable, not more.** Under
-   {worst_flip[0].replace('local 3B, ', '')} the verdict reverses on
-   {pct(worst_flip[1]['flip_rate'])} of comparisons when the order is reversed, worse
-   than the same model given a bare instruction. Reasoning traces are not free
+7. **Chain of thought made the local judge less stable, not more.** Under the
+   {worst_flip[0].replace('local 3B, ', '').replace(' prompt', '')} prompt the verdict reverses on
+   {pct(worst_flip[1]['flip_rate'])} of comparisons when the order is reversed, worse than a coin, and it is the one prompt with a real thumb on the
+   scale: it picks whichever answer came first
+   {pct(worst_flip[1]['position_one_rate'])} of the time. Reasoning traces are not free
    reliability.
+8. **The rubric that warns against length and position bias made agreement
+   worse.** Swapping the bare prompt for the rubric costs the local judge
+   {num(abs(next(r['delta'] for r in m['mitigations'] if 'rubric prompt instead of bare' in r['mitigation'])))} points, interval excluding zero. Telling a judge not to be biased is not a
+   mitigation until it has been measured as one.
 """
 
     parts.append(

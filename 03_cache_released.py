@@ -53,8 +53,15 @@ def positional(winner, model_1, model_2, model_first):
     return "first" if winner_model == model_first else "second"
 
 
-def store(judge_id, template, prompt, sample, verdict, text, extra):
+def store(judge_id, template, prompt, sample, verdict, text, context, extra=None):
     key = cache.cache_key(judge_id, template, prompt, sample)
+    existing = cache.get(judge_id, key)
+    if existing is not None:
+        # Same prompt, so the same released answer serves both contexts. This is
+        # what happens when a comparison's two responses are byte identical.
+        cache.add_context(existing, context)
+        cache.put(judge_id, key, existing)
+        return key
     record = {
         "key": key,
         "judge_id": judge_id,
@@ -68,7 +75,8 @@ def store(judge_id, template, prompt, sample, verdict, text, extra):
         "latency_s": None,
         "source": "lmsys/mt-bench released judgments",
     }
-    record.update(extra)
+    record.update(extra or {})
+    cache.add_context(record, context)
     cache.put(judge_id, key, record)
     return key
 
@@ -109,7 +117,8 @@ def main():
                     sample,
                     positional(r[winner_field], m1, m2, first),
                     r[judgment_field],
-                    {"item_id": item_id, "order": order, "released_game": game},
+                    {"item_id": item_id, "order": order, "condition": "base"},
+                    {"released_game": game},
                 )
             n_pair += 1
             n_rerun += sample > 0
@@ -143,7 +152,8 @@ def main():
             0,
             verdict,
             text,
-            {"item_id": row.item_id, "order": "ab", "score_a": sa, "score_b": sb},
+            {"item_id": row.item_id, "order": "ab", "condition": "base"},
+            {"score_a": sa, "score_b": sb},
         )
         n_single += 1
 
