@@ -14,6 +14,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import PercentFormatter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "output", "figures")
@@ -51,6 +52,10 @@ def role_colour(label):
     return JUDGE
 
 
+def as_percent(axis, decimals=0):
+    axis.set_major_formatter(PercentFormatter(xmax=1, decimals=decimals))
+
+
 def finish(fig, path):
     fig.tight_layout()
     fig.savefig(path, bbox_inches="tight")
@@ -73,6 +78,8 @@ def fig_agreement(m):
         ax.text(r["ci"][1] + 0.012, i, f"{v:.1%}  (n={r['n']})", va="center", fontsize=8, color=MUTED)
     ax.set_yticks(list(y), labels)
     ax.set_xlim(0.4, 1.16)
+    ax.set_xticks([0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+    as_percent(ax.xaxis)
     ax.set_xlabel("agreement with the human majority, ties excluded")
     ax.xaxis.grid(True, color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
@@ -111,6 +118,7 @@ def fig_position(m):
     ax.set_ylim(-1.4, len(entries) - 0.4)
     ax.set_yticks(list(y), labels)
     ax.set_xlim(0, max(max(values), 0.3) * 1.55)
+    as_percent(ax.xaxis)
     ax.set_xlabel("comparisons where reversing the presentation order reverses the verdict")
     ax.xaxis.grid(True, color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
@@ -134,6 +142,7 @@ def fig_verbosity(m):
     ax.axvline(0.5, color=GRID, linewidth=1.0)
     ax.set_yticks(list(y), [k for k, _ in entries])
     ax.set_xlim(0.4, 1.05)
+    as_percent(ax.xaxis)
     ax.set_xlabel("share of decided comparisons where the longer answer is chosen")
     ax.xaxis.grid(True, color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
@@ -161,6 +170,7 @@ def fig_prompt_sensitivity(m):
         ax.plot(x, [board.get(m_, float("nan")) for m_ in models], marker="o", markersize=6,
                 linewidth=1.6, linestyle=dash, color=colour, alpha=0.9, label=key)
     ax.set_xticks(list(x), models, rotation=20, ha="right")
+    as_percent(ax.yaxis)
     ax.set_ylabel("win rate over all comparisons")
     ax.yaxis.grid(True, color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
@@ -186,6 +196,7 @@ def fig_mitigations(m):
                 f"{d:+.1%}", va="center", ha="left" if side > 0 else "right", fontsize=8, color=MUTED)
     ax.axvline(0, color=INK, linewidth=1.0)
     ax.set_yticks(list(y), [r["mitigation"] for r in rows])
+    as_percent(ax.xaxis)
     ax.set_xlabel("change in agreement with the human majority")
     ax.xaxis.grid(True, color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
@@ -228,6 +239,7 @@ def fig_cost(m):
         ax.text(0.995, ceiling["accuracy"] + 0.005, "human ceiling  ", color=HUMAN, fontsize=8,
                 ha="right", transform=ax.get_yaxis_transform(which="grid"))
     ax.set_xlabel("USD per 1000 comparisons (estimated from cached token counts)")
+    as_percent(ax.yaxis)
     ax.set_ylabel("agreement with the human majority")
     ax.set_xlim(-8, max(p[0] for p in points) * 1.55 + 8)
     ax.set_ylim(min(p[1] for p in points) - 0.06, max(max(p[1] for p in points), ceiling["accuracy"] if ceiling else 0) + 0.05)

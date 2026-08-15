@@ -81,6 +81,14 @@ turn, is what fits in a few hours on a laptop. The measurement code drops any
 comparison the judge has not finished every condition on, so a partial run cannot
 bias the template comparison toward whichever template happened to run first.
 
+## The majority vote mitigation mixes one greedy sample with two sampled ones
+
+Sample 0 is temperature 0, samples 1 and 2 are temperature 0.7. The baseline it
+is compared against is sample 0 alone, so the comparison answers the question a
+team actually asks: "I have a greedy judge, does voting help?" Three sampled
+draws would be a cleaner experiment about sampling and a worse answer to that
+question.
+
 ## Cost is estimated from characters, and says so
 
 The released judgment files carry no token usage, so input and output tokens are

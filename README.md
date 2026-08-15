@@ -33,9 +33,9 @@ key, no model call, no network beyond the initial public data download.
   3355 individual votes from 65 annotators over
   80 MT-Bench questions and 6 models
   (alpaca-13b, claude-v1, gpt-3.5-turbo, gpt-4, llama-13b, vicuna-13b-v1.2), first and second conversation turns.
-- **Human labels**: 671 for the first model,
-  591 for the second,
-  552 ties.
+- **Human labels**: the annotator majority names a winner on
+  1262
+  comparisons and ties on 552.
   961 comparisons have two or more annotators,
   which is what makes a ceiling possible.
 - **Judges**: GPT-4 (0613) pairwise in both presentation orders and GPT-4 single answer

@@ -1,0 +1,1 @@
+{"condition": "base", "in_tokens": 453, "item_id": "q108-t2-llama-13b-vicuna-13b-v1.2", "judge_id": "qwen2.5-3b-4bit-local", "key": "1da42971b9238f670810875d16570aff9a1ad422e24a367fdef48a0342160506", "latency_s": 0.7299900840152986, "order": "ab", "out_tokens": 3, "sample": 1, "template": "rubric", "text": "[[B]]", "verdict": "second"}

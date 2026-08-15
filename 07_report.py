@@ -112,9 +112,9 @@ key, no model call, no network beyond the initial public data download.
   {data['human_votes']} individual votes from {data['annotators']} annotators over
   {data['questions']} MT-Bench questions and {len(data['models'])} models
   ({', '.join(data['models'])}), first and second conversation turns.
-- **Human labels**: {data['human_label_counts'].get('a', 0)} for the first model,
-  {data['human_label_counts'].get('b', 0)} for the second,
-  {data['human_label_counts'].get('tie', 0)} ties.
+- **Human labels**: the annotator majority names a winner on
+  {data['human_label_counts'].get('a', 0) + data['human_label_counts'].get('b', 0)}
+  comparisons and ties on {data['human_label_counts'].get('tie', 0)}.
   {data['comparisons_with_2plus_annotators']} comparisons have two or more annotators,
   which is what makes a ceiling possible.
 - **Judges**: GPT-4 (0613) pairwise in both presentation orders and GPT-4 single answer
