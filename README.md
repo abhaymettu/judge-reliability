@@ -7,6 +7,10 @@ reaches 70.6 percent. Reversing the order the two answers are shown in
 flips the verdict on 16.1 percent of comparisons, and swap averaging
 recovers 2.9 points of agreement, which closes the gap to that ceiling.**
 
+![GPT-4 judge agreement with the human majority, against the human ceiling and a length-only baseline](output/figures/fig1_agreement.png)
+
+Write-up: [abhaymettu.com/research/judge-reliability](https://abhaymettu.com/research/judge-reliability/)
+
 The judge is good. It is also not better than a careful human, it is only
 14.9 points better than a rule that reads none
 of the text and always picks the longer answer, and its order sensitivity turns out to
