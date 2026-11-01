@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "judgment cache files are keyed by the SHA-256 of the prompt"
+paths = ['''data/judgments/.*\.json''']
