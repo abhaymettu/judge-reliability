@@ -1,6 +1,16 @@
 # judge-reliability
 
-**Across 1814 human labelled MT-Bench comparisons, GPT-4 judging a
+**How much can you trust an LLM as a judge? This repo checks GPT-4 judging MT-Bench answers against the people who
+labelled them, against the best a human can do on the same items, against a rule that just picks the longer
+answer, and against itself when the two answers swap places.**
+
+The judge is good. It is also not better than a careful human, it is only
+14.9 points better than a rule that reads none
+of the text and always picks the longer answer, and its order sensitivity turns out to
+be indistinguishable from its own run to run noise. Those three facts are the reason to
+measure a judge rather than assume one.
+
+In numbers: across 1814 human labelled MT-Bench comparisons, GPT-4 judging a
 pair of answers agrees with the human majority 85.5 percent of the time,
 and a length only baseline reaches 70.6 percent. A like for like human
 ceiling exists only on the 249 comparisons with three or more
@@ -11,13 +21,7 @@ Reversing the order the two answers are shown in flips the verdict on
 16.1 percent of comparisons; swap averaging recovers
 2.9 points over the full set and leaves the judge
 1.1 points below the ceiling on its comparisons, an interval of
--5.7 to +3.5 that includes zero.**
-
-The judge is good. It is also not better than a careful human, it is only
-14.9 points better than a rule that reads none
-of the text and always picks the longer answer, and its order sensitivity turns out to
-be indistinguishable from its own run to run noise. Those three facts are the reason to
-measure a judge rather than assume one.
+-5.7 to +3.5 that includes zero.
 
 Part of [benchmeasure](https://github.com/abhaymettu/benchmeasure), benchmarks treated as measurement instruments: reliability ([agent-validity-ceiling](https://github.com/abhaymettu/agent-validity-ceiling)), invariance ([benchdif](https://github.com/abhaymettu/benchdif)), and the scorer (this repo). Paper: [benchmeasure.pdf](https://github.com/abhaymettu/benchmeasure/blob/main/paper/benchmeasure.pdf).
 

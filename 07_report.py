@@ -121,7 +121,17 @@ def build(m):
     parts.append(
         f"""# judge-reliability
 
-**Across {data['comparisons']} human labelled MT-Bench comparisons, GPT-4 judging a
+**How much can you trust an LLM as a judge? This repo checks GPT-4 judging MT-Bench answers against the people who
+labelled them, against the best a human can do on the same items, against a rule that just picks the longer
+answer, and against itself when the two answers swap places.**
+
+The judge is good. It is also not better than a careful human, it is only
+{num(gpt4['accuracy'] - length['accuracy'])} points better than a rule that reads none
+of the text and always picks the longer answer, and its order sensitivity turns out to
+be indistinguishable from its own run to run noise. Those three facts are the reason to
+measure a judge rather than assume one.
+
+In numbers: across {data['comparisons']} human labelled MT-Bench comparisons, GPT-4 judging a
 pair of answers agrees with the human majority {pct(gpt4['accuracy'])} of the time,
 and a length only baseline reaches {pct(length['accuracy'])}. A like for like human
 ceiling exists only on the {matched['n_comparisons']} comparisons with three or more
@@ -132,13 +142,7 @@ Reversing the order the two answers are shown in flips the verdict on
 {pct(position['flip_rate'])} of comparisons; swap averaging recovers
 {num(swap_mitigation['delta'])} points over the full set and leaves the judge
 {gap_words(m_swap)} the ceiling on its comparisons, an interval of
-{diff_interval(m_swap)} that {zero_phrase(m_swap)}.**
-
-The judge is good. It is also not better than a careful human, it is only
-{num(gpt4['accuracy'] - length['accuracy'])} points better than a rule that reads none
-of the text and always picks the longer answer, and its order sensitivity turns out to
-be indistinguishable from its own run to run noise. Those three facts are the reason to
-measure a judge rather than assume one.
+{diff_interval(m_swap)} that {zero_phrase(m_swap)}.
 
 Part of [benchmeasure](https://github.com/abhaymettu/benchmeasure), benchmarks treated as measurement instruments: reliability ([agent-validity-ceiling](https://github.com/abhaymettu/agent-validity-ceiling)), invariance ([benchdif](https://github.com/abhaymettu/benchdif)), and the scorer (this repo). Paper: [benchmeasure.pdf](https://github.com/abhaymettu/benchmeasure/blob/main/paper/benchmeasure.pdf).
 
