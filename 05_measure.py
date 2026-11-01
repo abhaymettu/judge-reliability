@@ -148,6 +148,36 @@ def human_ceiling(items, setup):
     }
 
 
+def leave_one_out(votes):
+    """(vote, majority of the other votes) for each annotator, ties on a split.
+    Empty for comparisons with fewer than three votes."""
+    if len(votes) < 3:
+        return []
+    out = []
+    for i, vote in enumerate(votes):
+        counts = Counter(votes[:i] + votes[i + 1:])
+        top = max(counts.values())
+        winners = [k for k, v in counts.items() if v == top]
+        out.append((vote, winners[0] if len(winners) == 1 else TIE))
+    return out
+
+
+def loo_ceiling_counts(items, setup):
+    """Per comparison agreeing scorings and scorings, one annotator against the
+    majority of the others."""
+    hits, include = [], []
+    for row in items.itertuples():
+        agree = total = 0
+        for vote, label in leave_one_out(json.loads(row.votes)):
+            if setup == "no_ties" and (vote == TIE or label == TIE):
+                continue
+            total += 1
+            agree += vote == label
+        hits.append(float(agree))
+        include.append(float(total))
+    return np.array(hits), np.array(include)
+
+
 def human_vs_majority_ceiling(items, setup):
     """The other ceiling, and the fairer one.
 
@@ -156,26 +186,7 @@ def human_vs_majority_ceiling(items, setup):
     against the majority of the others, on comparisons with three or more votes.
     Anything else compares a judge on easy mode against humans on hard mode.
     """
-    hits, include = [], []
-    for row in items.itertuples():
-        votes = json.loads(row.votes)
-        if len(votes) < 3:
-            hits.append(0.0)
-            include.append(0.0)
-            continue
-        agree = total = 0
-        for i, vote in enumerate(votes):
-            rest = votes[:i] + votes[i + 1:]
-            counts = Counter(rest)
-            top = max(counts.values())
-            winners = [k for k, v in counts.items() if v == top]
-            label = winners[0] if len(winners) == 1 else TIE
-            if setup == "no_ties" and (vote == TIE or label == TIE):
-                continue
-            total += 1
-            agree += vote == label
-        hits.append(float(agree))
-        include.append(float(total))
+    hits, include = loo_ceiling_counts(items, setup)
     point, lo, hi, n = hstats.bootstrap_ci(hits, include)
     return {
         "label": "human ceiling, one annotator vs the majority of the others",
@@ -185,6 +196,65 @@ def human_vs_majority_ceiling(items, setup):
         "n": n,
         "n_comparisons": int(sum(1 for v in include if v > 0)),
     }
+
+
+def matched_to_ceiling(items, configs):
+    """Each judge scored on exactly the comparisons the leave one out ceiling is
+    computed on, no-ties setup, with a paired difference against the ceiling.
+
+    Two targets (see DECISIONS.md). "full_majority" scores the judge against the
+    majority of all annotators, which is how a judge is scored everywhere else
+    in the repo. "same_targets" scores the judge against every leave one out
+    majority the ceiling uses, on the same scorings the ceiling includes, so
+    judge and annotator face identical labels. Both resample comparisons, and
+    the difference uses the same resampled comparisons for judge and ceiling.
+    """
+    c_hits, c_inc = loo_ceiling_counts(items, "no_ties")
+    keep = c_inc > 0
+    sub = items[keep]
+    c_hits, c_inc = c_hits[keep], c_inc[keep]
+    point, lo, hi, n = hstats.bootstrap_ci(c_hits, c_inc)
+    out = {
+        "note": "comparisons with three or more votes where the leave one out ceiling scores at least one annotator, ties excluded",
+        "n_comparisons": int(len(sub)),
+        "ceiling": {
+            "label": "human ceiling, one annotator vs the majority of the others",
+            "accuracy": point,
+            "ci": [lo, hi],
+            "n": n,
+        },
+        "full_majority": [],
+        "same_targets": [],
+    }
+    for label, choices in configs.items():
+        full = score(sub, choices, "no_ties")
+        s_hits, s_inc = [], []
+        for row in sub.itertuples():
+            got = choices.get(row.item_id)
+            agree = total = 0
+            if got in ("a", "b"):
+                for vote, target in leave_one_out(json.loads(row.votes)):
+                    if vote == TIE or target == TIE:
+                        continue
+                    total += 1
+                    agree += got == target
+            s_hits.append(float(agree))
+            s_inc.append(float(total))
+        for key, (h, i) in (("full_majority", full), ("same_targets", (np.array(s_hits), np.array(s_inc)))):
+            p, plo, phi, pn = hstats.bootstrap_ci(h, i)
+            diff, dlo, dhi = hstats.bootstrap_diff_ci(h, i, c_hits, c_inc)
+            out[key].append(
+                {
+                    "label": label,
+                    "accuracy": p,
+                    "ci": [plo, phi],
+                    "n": pn,
+                    "n_comparisons": int((i > 0).sum()),
+                    "minus_ceiling": diff,
+                    "minus_ceiling_ci": [dlo, dhi],
+                }
+            )
+    return out
 
 
 def length_choices(items):
@@ -442,6 +512,11 @@ def main():
             scope = local_items if label.startswith("local") else items
             rows.append(agreement(scope, choices, setup, label))
         metrics["agreement"][setup] = rows
+
+    # The judges on exactly the comparisons the leave one out ceiling uses, so
+    # "judge against ceiling" compares the same items.
+    matched = ("gpt-4 pairwise, one order", "gpt-4 pairwise, swap averaged", "gpt-4 single answer grading", "length baseline")
+    metrics["agreement_matched"] = matched_to_ceiling(items, {k: configs[k] for k in matched})
 
     # Same, restricted to the local judge's subsample, so the comparison between
     # the frontier judge and the local judge is on identical comparisons.

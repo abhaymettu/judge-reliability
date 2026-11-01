@@ -2,10 +2,16 @@
 
 **Across 1814 human labelled MT-Bench comparisons, GPT-4 judging a
 pair of answers agrees with the human majority 85.5 percent of the time,
-against a human ceiling of 88.2 percent and a length only baseline that
-reaches 70.6 percent. Reversing the order the two answers are shown in
-flips the verdict on 16.1 percent of comparisons, and swap averaging
-recovers 2.9 points of agreement, which closes the gap to that ceiling.**
+and a length only baseline reaches 70.6 percent. A like for like human
+ceiling exists only on the 249 comparisons with three or more
+votes. On those, one annotator agrees with the majority of the others
+88.2 percent of the time and GPT-4 scores 83.4 percent,
+4.8 points below the ceiling (interval on the difference -9.6 to +0.1).
+Reversing the order the two answers are shown in flips the verdict on
+16.1 percent of comparisons; swap averaging recovers
+2.9 points over the full set and leaves the judge
+1.1 points below the ceiling on its comparisons, an interval of
+-5.7 to +3.5 that includes zero.**
 
 The judge is good. It is also not better than a careful human, it is only
 14.9 points better than a rule that reads none
@@ -85,8 +91,35 @@ annotator is 82.7 percent, which is what people usually quote.
 But a judge is scored against the *majority* of several annotators, a denoised
 label, so the like for like number is one annotator against the majority of the
 others: 88.2 percent (85.0 to 91.1). Quote the first and GPT-4
-looks superhuman. Quote the second and it lands 2.7
-points short, and swap averaging closes that gap.
+looks superhuman. The second can only be computed on 249
+comparisons, so the judge has to be scored on those same comparisons before the
+two can be subtracted.
+
+### The judge and the ceiling on the same comparisons
+
+Each configuration below is scored on exactly the 249
+comparisons the like for like ceiling uses, against the majority of all the
+annotators, ties excluded on both sides. The difference is paired: judge and
+ceiling are computed on the same resampled comparisons in every bootstrap draw.
+
+| configuration | agreement | 95 percent CI | comparisons scored | minus ceiling | 95 percent CI |
+| --- | --- | --- | --- | --- | --- |
+| human ceiling, one annotator vs the majority of the others | 88.2 | 84.9 to 91.0 | 249 (752 scorings) | | |
+| gpt-4 single answer grading | 93.4 | 89.2 to 97.1 | 151 | +5.2 | +0.6 to +9.7 |
+| gpt-4 pairwise, swap averaged | 87.1 | 82.4 to 91.4 | 209 | -1.1 | -5.7 to +3.5 |
+| gpt-4 pairwise, one order | 83.4 | 78.5 to 88.0 | 235 | -4.8 | -9.6 to +0.1 |
+| length baseline | 73.7 | 68.2 to 79.0 | 243 | -14.5 | -20.4 to -8.6 |
+
+One order GPT-4 sits 4.8 points below the ceiling, an interval that
+includes zero. Swap averaged it sits 1.1 points below, an interval that
+includes zero. Single answer grading sits 5.2 points above, an interval
+that excludes zero, but it is scored on 151 of the
+249 comparisons, against 235 for one order, because it
+calls far more ties. The length
+rule sits 14.5 points below. Scoring the judge instead against every leave one
+out majority the annotators face, on the same scorings, puts one order GPT-4
+2.3 points below the ceiling (-7.0 to +2.1); both versions are in
+`output/metrics.json` under `agreement_matched`.
 
 Cohen's kappa tells the same story with the chance agreement taken out:
 0.47 for GPT-4 against
@@ -262,8 +295,10 @@ magnitude. Swap averaging doubles it.
    83 percent of what GPT-4 achieves while reading
    none of the text. Any judge evaluation without this baseline in it is not
    telling you what the judge contributes.
-3. **The judge is not better than a person.** 85.5 percent against a like
-   for like human ceiling of 88.2 percent. The commonly quoted comparison,
+3. **The pairwise judge is not better than a person.** On the
+   249 comparisons where a like for like ceiling exists, GPT-4
+   scores 83.4 percent against 88.2 percent, and the interval on
+   the difference (-9.6 to +0.1) includes zero. The commonly quoted comparison,
    against raw annotator to annotator agreement of 82.7 percent, makes
    the judge look superhuman and is the wrong comparison.
 4. **The judge is partial to itself**, by 12.7 points against
@@ -326,8 +361,9 @@ a fairer human ceiling and a noise floor for the order flip rate.
   annotator against another. This repo adds the like for like ceiling: one
   annotator against the majority of the others, which is what the judge is scored
   against. On the same data that ceiling is 88.2 percent, against
-  82.7 percent for annotator against annotator, and the judge
-  falls below it.
+  82.7 percent for annotator against annotator, and scored on
+  the same comparisons the pairwise judge's point estimate falls
+  below it.
 - **Anand et al. 2026** apply generalizability theory to 373,019 LLM judge scores.
   They show that a single judge caps generalizability however many items you add,
   and that judging in both orders raises the cap. Theirs is a variance decomposition

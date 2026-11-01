@@ -34,7 +34,10 @@ The ceiling is computed only on comparisons with two or more annotators, 961 of
 them. The leave one out ceiling is narrower still: it needs three or more votes,
 so it rests on 249 comparisons, which between them supply 752 annotator against
 majority scorings. That is the ceiling the headline is measured against, and it
-is the thinnest number in the repo.
+is the thinnest number in the repo. The full set 85.5 percent for GPT-4 and that
+ceiling are on different comparisons and should not be subtracted: on the 249
+ceiling comparisons GPT-4 one order scores 83.4 percent, 4.8 points under the
+88.2 percent ceiling, and the paired interval on the difference includes zero.
 
 ## Self preference is measured on one judge and one family
 

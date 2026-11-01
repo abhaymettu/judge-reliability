@@ -250,6 +250,143 @@
       }
     ]
   },
+  "agreement_matched": {
+    "note": "comparisons with three or more votes where the leave one out ceiling scores at least one annotator, ties excluded",
+    "n_comparisons": 249,
+    "ceiling": {
+      "label": "human ceiling, one annotator vs the majority of the others",
+      "accuracy": 0.8816489361702128,
+      "ci": [
+        0.8493136857242943,
+        0.9104292606370611
+      ],
+      "n": 752
+    },
+    "full_majority": [
+      {
+        "label": "gpt-4 pairwise, one order",
+        "accuracy": 0.8340425531914893,
+        "ci": [
+          0.7853997251712973,
+          0.8798326180257511
+        ],
+        "n": 235,
+        "n_comparisons": 235,
+        "minus_ceiling": -0.04760638297872344,
+        "minus_ceiling_ci": [
+          -0.09625697745265623,
+          0.0005742060744459625
+        ]
+      },
+      {
+        "label": "gpt-4 pairwise, swap averaged",
+        "accuracy": 0.8708133971291866,
+        "ci": [
+          0.8235294117647058,
+          0.9142857142857143
+        ],
+        "n": 209,
+        "n_comparisons": 209,
+        "minus_ceiling": -0.010835539041026188,
+        "minus_ceiling_ci": [
+          -0.05671290159905237,
+          0.03482947544152226
+        ]
+      },
+      {
+        "label": "gpt-4 single answer grading",
+        "accuracy": 0.9337748344370861,
+        "ci": [
+          0.89171974522293,
+          0.9705936024044653
+        ],
+        "n": 151,
+        "n_comparisons": 151,
+        "minus_ceiling": 0.052125898266873305,
+        "minus_ceiling_ci": [
+          0.006467600037869421,
+          0.09669801256247346
+        ]
+      },
+      {
+        "label": "length baseline",
+        "accuracy": 0.7366255144032922,
+        "ci": [
+          0.6816326530612244,
+          0.7901234567901234
+        ],
+        "n": 243,
+        "n_comparisons": 243,
+        "minus_ceiling": -0.14502342176692062,
+        "minus_ceiling_ci": [
+          -0.2040807557819532,
+          -0.08630533371774698
+        ]
+      }
+    ],
+    "same_targets": [
+      {
+        "label": "gpt-4 pairwise, one order",
+        "accuracy": 0.8583333333333333,
+        "ci": [
+          0.8104660809487543,
+          0.901858028751292
+        ],
+        "n": 720,
+        "n_comparisons": 240,
+        "minus_ceiling": -0.0233156028368795,
+        "minus_ceiling_ci": [
+          -0.07004137807432209,
+          0.02090713737061657
+        ]
+      },
+      {
+        "label": "gpt-4 pairwise, swap averaged",
+        "accuracy": 0.8928571428571429,
+        "ci": [
+          0.8483859501605259,
+          0.9321767130521074
+        ],
+        "n": 644,
+        "n_comparisons": 213,
+        "minus_ceiling": 0.011208206686930122,
+        "minus_ceiling_ci": [
+          -0.03164000488446826,
+          0.0515840469930423
+        ]
+      },
+      {
+        "label": "gpt-4 single answer grading",
+        "accuracy": 0.9516806722689075,
+        "ci": [
+          0.9160993768136625,
+          0.9810924369747899
+        ],
+        "n": 476,
+        "n_comparisons": 152,
+        "minus_ceiling": 0.07003173609869473,
+        "minus_ceiling_ci": [
+          0.027911997127508307,
+          0.11039931360720291
+        ]
+      },
+      {
+        "label": "length baseline",
+        "accuracy": 0.7423230974632844,
+        "ci": [
+          0.6837267250241095,
+          0.7988752143354576
+        ],
+        "n": 749,
+        "n_comparisons": 248,
+        "minus_ceiling": -0.13932583870692838,
+        "minus_ceiling_ci": [
+          -0.20078252692385193,
+          -0.07912622828624298
+        ]
+      }
+    ]
+  },
   "agreement_on_local_subsample": [
     {
       "label": "human to human ceiling",

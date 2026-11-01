@@ -60,6 +60,25 @@ label. An individual annotator is not. So the README reports both:
 The second is the higher bar and the one the headline uses. Reporting only the
 first is how a judge ends up looking better than humans.
 
+## Judge against ceiling is scored on the ceiling's own comparisons
+
+The leave one out ceiling exists only on comparisons with three or more votes,
+while the judge's headline agreement is over every comparison. Subtracting one
+from the other compares different items, so `agreement_matched` in
+`metrics.json` rescored each GPT-4 configuration and the length rule on exactly
+the comparisons where the ceiling scores at least one annotator, no-ties setup,
+same bootstrap over comparisons, and a paired difference that resamples judge
+and ceiling together.
+
+The judge's target there is the majority of all the annotators, the same label
+it is scored against everywhere else. The ceiling keeps its definition, one
+annotator against the majority of the others, because an annotator cannot be
+scored against a majority that includes their own vote. The judge's target is
+therefore built from one more vote than an annotator's, which favours the judge
+slightly. To bound that, the same file also carries a `same_targets` version that
+scores the judge against every leave one out majority on exactly the scorings the
+ceiling counts. The README quotes the full majority version and states the other.
+
 ## The bootstrap resamples comparisons, never judgments
 
 The two presentation orders of one comparison, and the several annotator votes on

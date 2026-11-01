@@ -32,6 +32,40 @@ def find(rows, label):
     raise KeyError(f"{label} is not in metrics.json, so it cannot go in the README")
 
 
+def signed(x):
+    return f"{'+' if x >= 0 else '-'}{abs(100 * x):.1f}"
+
+
+def diff_interval(row):
+    lo, hi = row["minus_ceiling_ci"]
+    return f"{signed(lo)} to {signed(hi)}"
+
+
+def zero_phrase(row):
+    lo, hi = row["minus_ceiling_ci"]
+    return "includes zero" if lo <= 0 <= hi else "excludes zero"
+
+
+def gap_words(row):
+    d = row["minus_ceiling"]
+    return f"{num(abs(d))} points {'below' if d < 0 else 'above'}"
+
+
+def matched_table(matched):
+    out = [
+        "| configuration | agreement | 95 percent CI | comparisons scored | minus ceiling | 95 percent CI |",
+        "| --- | --- | --- | --- | --- | --- |",
+        f"| {matched['ceiling']['label']} | {num(matched['ceiling']['accuracy'])} | {interval(matched['ceiling'])} | "
+        f"{matched['n_comparisons']} ({matched['ceiling']['n']} scorings) | | |",
+    ]
+    for row in sorted(matched["full_majority"], key=lambda r: -r["accuracy"]):
+        out.append(
+            f"| {row['label']} | {num(row['accuracy'])} | {interval(row)} | {row['n']} | "
+            f"{signed(row['minus_ceiling'])} | {diff_interval(row)} |"
+        )
+    return "\n".join(out)
+
+
 def agreement_table(rows):
     out = [
         "| configuration | agreement | 95 percent CI | comparisons scored |",
@@ -64,15 +98,15 @@ def build(m):
     verb_human = m["verbosity"]["human majority"]
     verb_gpt4 = m["verbosity"]["gpt-4 pairwise, one order"]
 
-    # The one comparative claim in the headline, derived rather than asserted, so
-    # it cannot survive the numbers moving underneath it.
-    ceiling_gap = ceiling["accuracy"] - gpt4["accuracy"]
-    recovered = swap_mitigation["delta"]
-    gap_phrase = (
-        "which closes the gap to that ceiling"
-        if recovered >= ceiling_gap
-        else f"which closes {recovered / ceiling_gap:.0%} of the {num(ceiling_gap)} point gap to that ceiling"
-    )
+    # Judge against ceiling is only ever stated on the comparisons the ceiling is
+    # computed on. The full set judge numbers and the ceiling are different items.
+    matched = m["agreement_matched"]
+    matched_rows = {r["label"]: r for r in matched["full_majority"]}
+    m_gpt4 = matched_rows["gpt-4 pairwise, one order"]
+    m_swap = matched_rows["gpt-4 pairwise, swap averaged"]
+    m_single = matched_rows["gpt-4 single answer grading"]
+    m_length = matched_rows["length baseline"]
+    m_same = {r["label"]: r for r in matched["same_targets"]}["gpt-4 pairwise, one order"]
 
     local_rows = [r for r in no_ties if r["label"].startswith("local 3B")]
     has_local = bool(local_rows)
@@ -89,10 +123,16 @@ def build(m):
 
 **Across {data['comparisons']} human labelled MT-Bench comparisons, GPT-4 judging a
 pair of answers agrees with the human majority {pct(gpt4['accuracy'])} of the time,
-against a human ceiling of {pct(ceiling['accuracy'])} and a length only baseline that
-reaches {pct(length['accuracy'])}. Reversing the order the two answers are shown in
-flips the verdict on {pct(position['flip_rate'])} of comparisons, and swap averaging
-recovers {num(swap_mitigation['delta'])} points of agreement, {gap_phrase}.**
+and a length only baseline reaches {pct(length['accuracy'])}. A like for like human
+ceiling exists only on the {matched['n_comparisons']} comparisons with three or more
+votes. On those, one annotator agrees with the majority of the others
+{pct(ceiling['accuracy'])} of the time and GPT-4 scores {pct(m_gpt4['accuracy'])},
+{gap_words(m_gpt4)} the ceiling (interval on the difference {diff_interval(m_gpt4)}).
+Reversing the order the two answers are shown in flips the verdict on
+{pct(position['flip_rate'])} of comparisons; swap averaging recovers
+{num(swap_mitigation['delta'])} points over the full set and leaves the judge
+{gap_words(m_swap)} the ceiling on its comparisons, an interval of
+{diff_interval(m_swap)} that {zero_phrase(m_swap)}.**
 
 The judge is good. It is also not better than a careful human, it is only
 {num(gpt4['accuracy'] - length['accuracy'])} points better than a rule that reads none
@@ -159,8 +199,29 @@ annotator is {pct(raw_ceiling['accuracy'])}, which is what people usually quote.
 But a judge is scored against the *majority* of several annotators, a denoised
 label, so the like for like number is one annotator against the majority of the
 others: {pct(ceiling['accuracy'])} ({interval(ceiling)}). Quote the first and GPT-4
-looks superhuman. Quote the second and it lands {num(ceiling['accuracy'] - gpt4['accuracy'])}
-points short, and swap averaging closes that gap.
+looks superhuman. The second can only be computed on {matched['n_comparisons']}
+comparisons, so the judge has to be scored on those same comparisons before the
+two can be subtracted.
+
+### The judge and the ceiling on the same comparisons
+
+Each configuration below is scored on exactly the {matched['n_comparisons']}
+comparisons the like for like ceiling uses, against the majority of all the
+annotators, ties excluded on both sides. The difference is paired: judge and
+ceiling are computed on the same resampled comparisons in every bootstrap draw.
+
+{matched_table(matched)}
+
+One order GPT-4 sits {gap_words(m_gpt4)} the ceiling, an interval that
+{zero_phrase(m_gpt4)}. Swap averaged it sits {gap_words(m_swap)}, an interval that
+{zero_phrase(m_swap)}. Single answer grading sits {gap_words(m_single)}, an interval
+that {zero_phrase(m_single)}, but it is scored on {m_single['n']} of the
+{matched['n_comparisons']} comparisons, against {m_gpt4['n']} for one order, because it
+calls far more ties. The length
+rule sits {gap_words(m_length)}. Scoring the judge instead against every leave one
+out majority the annotators face, on the same scorings, puts one order GPT-4
+{gap_words(m_same)} the ceiling ({diff_interval(m_same)}); both versions are in
+`output/metrics.json` under `agreement_matched`.
 
 Cohen's kappa tells the same story with the chance agreement taken out:
 {m['kappa']['gpt-4 pairwise, one order']['cohens_kappa']:.2f} for GPT-4 against
@@ -418,8 +479,10 @@ magnitude. Swap averaging doubles it.
    {pct(length['accuracy'] / gpt4['accuracy'], 0)} of what GPT-4 achieves while reading
    none of the text. Any judge evaluation without this baseline in it is not
    telling you what the judge contributes.
-3. **The judge is not better than a person.** {pct(gpt4['accuracy'])} against a like
-   for like human ceiling of {pct(ceiling['accuracy'])}. The commonly quoted comparison,
+3. **The pairwise judge is not better than a person.** On the
+   {matched['n_comparisons']} comparisons where a like for like ceiling exists, GPT-4
+   scores {pct(m_gpt4['accuracy'])} against {pct(ceiling['accuracy'])}, and the interval on
+   the difference ({diff_interval(m_gpt4)}) {zero_phrase(m_gpt4)}. The commonly quoted comparison,
    against raw annotator to annotator agreement of {pct(raw_ceiling['accuracy'])}, makes
    the judge look superhuman and is the wrong comparison.
 4. **The judge is partial to itself**, by {num(self_pref['difference'])} points against
@@ -466,8 +529,9 @@ a fairer human ceiling and a noise floor for the order flip rate.
   annotator against another. This repo adds the like for like ceiling: one
   annotator against the majority of the others, which is what the judge is scored
   against. On the same data that ceiling is {pct(ceiling['accuracy'])}, against
-  {pct(raw_ceiling['accuracy'])} for annotator against annotator, and the judge
-  falls below it.
+  {pct(raw_ceiling['accuracy'])} for annotator against annotator, and scored on
+  the same comparisons the pairwise judge's point estimate falls
+  {'below' if m_gpt4['minus_ceiling'] < 0 else 'above'} it.
 - **Anand et al. 2026** apply generalizability theory to 373,019 LLM judge scores.
   They show that a single judge caps generalizability however many items you add,
   and that judging in both orders raises the cap. Theirs is a variance decomposition
@@ -557,8 +621,15 @@ def check_static_docs(m):
     ceiling = nt["human ceiling, one annotator vs the majority of the others"]
     self_pref = m["self_preference"]["gpt-4 judging gpt-4 responses"]
     control = m["self_preference"]["gpt-4 judging claude-v1 responses (control)"]
+    full_gpt4 = nt["gpt-4 pairwise, one order"]
+    m_gpt4 = {r["label"]: r for r in m["agreement_matched"]["full_majority"]}["gpt-4 pairwise, one order"]
+    lo, hi = m_gpt4["minus_ceiling_ci"]
 
     claims = [
+        ("LIMITATIONS.md", f"one order scores {100 * m_gpt4['accuracy']:.1f} percent", "matched judge"),
+        ("LIMITATIONS.md", f"{100 * abs(m_gpt4['minus_ceiling']):.1f} points under the {100 * ceiling['accuracy']:.1f} percent ceiling", "matched gap"),
+        ("LIMITATIONS.md", f"difference {'includes' if lo <= 0 <= hi else 'excludes'} zero", "matched interval"),
+        ("LIMITATIONS.md", f"full set {100 * full_gpt4['accuracy']:.1f} percent", "full set judge"),
         ("DECISIONS.md", f"{data['human_votes']} individual votes", "human votes"),
         ("DECISIONS.md", f"over {data['comparisons']} distinct comparisons", "comparisons"),
         ("DECISIONS.md", f"{m['rerun_stability']['n_judgments'] // 2} of those are comparisons", "reruns"),
